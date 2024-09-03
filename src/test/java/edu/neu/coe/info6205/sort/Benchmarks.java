@@ -33,77 +33,78 @@ public class Benchmarks {
     @Ignore // Slow
     public void testBubbleSortBenchmark() {
         String description = "BubbleSort";
-        Helper<Integer> helper = new BaseHelper<>(description, N, config);
-        final GenericSort<Integer> sort = new BubbleSort<>(helper);
+        Helper<Integer> helper = new NonInstrumentingComparableHelper<>(description, N, config);
+        final Sort<Integer> sort = new BubbleSort<>(helper);
         runBenchmark(description, sort, helper);
     }
 
     @Test
     public void testInsertionSortBenchmark() {
         String description = "Insertion sort";
-        Helper<Integer> helper = new BaseHelper<>(description, N, config);
-        final GenericSort<Integer> sort = new InsertionSort<>(helper);
+        Helper<Integer> helper = new NonInstrumentingComparableHelper<>(description, N, config);
+        final Sort<Integer> sort = new InsertionSort<>(helper);
         runBenchmark(description, sort, helper);
     }
 
     @Test
     public void testInsertionSortOptBenchmark() {
         String description = "Optimized Insertion sort";
-        Helper<Integer> helper = new BaseHelper<>(description, N, config);
-        final GenericSort<Integer> sort = new InsertionSortOpt<>(helper);
+        Helper<Integer> helper = new NonInstrumentingComparableHelper<>(description, N, config);
+        final Sort<Integer> sort = new InsertionSortOpt<>(helper);
         runBenchmark(description, sort, helper);
     }
 
     @Test
     public void testIntroSortBenchmark() {
         String description = "Intro sort";
-        final Helper<Integer> helper = new BaseHelper<>(description, N, config);
-        final GenericSort<Integer> sort = new IntroSort<>(helper);
+        final Helper<Integer> helper = new NonInstrumentingComparableHelper<>(description, N, config);
+        final Sort<Integer> sort = new IntroSort<>(helper);
         runBenchmark(description, sort, helper);
     }
 
     @Test
     public void testMergeSortBenchmark() {
         String description = "Merge sort";
-        final Helper<Integer> helper = new BaseHelper<>(description, N, config);
-        final GenericSort<Integer> sort = new MergeSort<>(helper);
-        runBenchmark(description, sort, helper);
+        final Helper<Integer> helper = new NonInstrumentingComparableHelper<>(description, N, config);
+        try (final Sort<Integer> sort = new MergeSort<>(helper)) {
+            runBenchmark(description, sort, helper);
+        }
     }
 
     @Test
     public void testQuickSort3WayBenchmark() {
         String description = "3-way Quick sort";
-        final Helper<Integer> helper = new BaseHelper<>(description, N, config);
-        final GenericSort<Integer> sort = new QuickSort_3way<>(helper);
+        final Helper<Integer> helper = new NonInstrumentingComparableHelper<>(description, N, config);
+        final Sort<Integer> sort = new QuickSort_3way<>(helper);
         runBenchmark(description, sort, helper);
     }
 
     @Test
     public void testQuickSortDualPivotSortBenchmark() {
         String description = "Dual-pivot Quick sort";
-        final Helper<Integer> helper = new BaseHelper<>(description, N, config);
-        final GenericSort<Integer> sort = new QuickSort_DualPivot<>(helper);
+        final Helper<Integer> helper = new NonInstrumentingComparableHelper<>(description, N, config);
+        final Sort<Integer> sort = new QuickSort_DualPivot<>(helper);
         runBenchmark(description, sort, helper);
     }
 
     @Test
     public void testSelectionSortBenchmark() {
         String description = "Selection sort";
-        Helper<Integer> helper = new BaseHelper<>(description, N, config);
-        final GenericSort<Integer> sort = new SelectionSort<>(helper);
+        Helper<Integer> helper = new NonInstrumentingComparableHelper<>(description, N, config);
+        final Sort<Integer> sort = new SelectionSort<>(helper);
         runBenchmark(description, sort, helper);
     }
 
     @Test
     public void testShellSortBenchmark() {
         String description = "3Shell sort";
-        final Helper<Integer> helper = new BaseHelper<>(description, N, config);
-        final GenericSort<Integer> sort = new ShellSort<>(5, helper);
+        final Helper<Integer> helper = new NonInstrumentingComparableHelper<>(description, N, config);
+        final Sort<Integer> sort = new ShellSort<>(5, helper);
         runBenchmark(description, sort, helper);
     }
 
-    public void runBenchmark(String description, GenericSort<Integer> sort, Helper<Integer> helper) {
-        helper.init(N);
+    public void runBenchmark(String description, Sort<Integer> sort, Helper<Integer> helper) {
+        sort.init(N);
         Supplier<Integer[]> supplier = () -> helper.random(Integer.class, Random::nextInt);
         final Benchmark<Integer[]> benchmark = new Benchmark_Timer<>(
                 description + " for " + N + " Integers",

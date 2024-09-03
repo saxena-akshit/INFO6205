@@ -1,9 +1,9 @@
 package edu.neu.coe.info6205.sort.elementary;
 
 import edu.neu.coe.info6205.sort.Helper;
-import edu.neu.coe.info6205.sort.SortWithHelper;
+import edu.neu.coe.info6205.sort.SortWithComparableHelper;
 
-public class HeapSort<X extends Comparable<X>> extends SortWithHelper<X> {
+public class HeapSort<X extends Comparable<X>> extends SortWithComparableHelper<X> {
 
     public HeapSort(Helper<X> helper) {
         super(helper);
@@ -17,6 +17,7 @@ public class HeapSort<X extends Comparable<X>> extends SortWithHelper<X> {
 
         // XXX sort-down phase
         Helper<X> helper = getHelper();
+        // TODO we over-count hits in the swap operation -- fix it.
         for (int i = array.length - 1; i >= 1; i--) {
             helper.swap(array, 0, i);
             maxHeap(array, i, 0);
@@ -29,6 +30,7 @@ public class HeapSort<X extends Comparable<X>> extends SortWithHelper<X> {
     }
 
     private void maxHeap(X[] array, int heapSize, int index) {
+        // TODO we over-count hits in the swap operation -- fix it.
         Helper<X> helper = getHelper();
         final int left = index * 2 + 1;
         final int right = index * 2 + 2;

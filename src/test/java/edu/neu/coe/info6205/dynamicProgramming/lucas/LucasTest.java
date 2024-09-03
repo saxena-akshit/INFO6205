@@ -22,6 +22,7 @@ public class LucasTest {
         assertEquals(123, lucas.get(10));
         assertEquals(199, lucas.get(11));
     }
+
     @Test
     public void testGet2() {
         assertEquals(2, new Lucas().get(0));
@@ -30,10 +31,12 @@ public class LucasTest {
         assertEquals(4, new Lucas().get(3));
         assertEquals(87403803, new Lucas().get(38));
     }
+
     @Test
     public void testGet3() {
         assertEquals(28143753123L, new Lucas().get(50));
     }
+
     @Test
     public void testGet4() {
         assertEquals(6440026026380244498L, new Lucas().get(90));

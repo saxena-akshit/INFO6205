@@ -4,7 +4,7 @@
 
 package edu.neu.coe.info6205.sort.linearithmic;
 
-import edu.neu.coe.info6205.sort.GenericSort;
+import edu.neu.coe.info6205.sort.Sort;
 import edu.neu.coe.info6205.util.Config;
 import org.junit.Test;
 
@@ -20,7 +20,8 @@ public class QuickSortTest {
         xs[1] = 4;
         xs[2] = 2;
         xs[3] = 1;
-        GenericSort<Integer> s = new QuickSort_3way<Integer>(Config.load(getClass()));
+        final Config config = Config.setupConfig("false", "false", "", "0", "1", "");
+        Sort<Integer> s = new QuickSort_3way<Integer>(config);
         Integer[] ys = s.sort(xs);
         assertEquals(Integer.valueOf(1), ys[0]);
         assertEquals(Integer.valueOf(2), ys[1]);
@@ -34,7 +35,7 @@ public class QuickSortTest {
         char[] charArray = testString.toCharArray();
         Character[] array = new Character[charArray.length];
         for (int i = 0; i < array.length; i++) array[i] = charArray[i];
-        GenericSort<Character> s = new QuickSort_3way<Character>(Config.load(getClass()));
+        Sort<Character> s = new QuickSort_3way<Character>(Config.load(getClass()));
         Partition<Character> p = ((QuickSort<Character>) s).createPartition(array, 0, array.length - 1);
         assertEquals(0, p.from);
         assertEquals(13, p.to);

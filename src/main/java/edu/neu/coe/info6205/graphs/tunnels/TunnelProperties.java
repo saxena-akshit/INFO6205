@@ -10,12 +10,10 @@ public class TunnelProperties implements Sequenced, Comparable<TunnelProperties>
     final int phase;
     int sequence;
 
-    @Override
     public int getSequence() {
         return sequence;
     }
 
-    @Override
     public void setSequence(int sequence) {
         this.sequence = sequence;
     }
@@ -43,7 +41,6 @@ public class TunnelProperties implements Sequenced, Comparable<TunnelProperties>
         return Objects.hash(cost, length, phase, sequence);
     }
 
-    @Override
     public int compareTo(TunnelProperties o) {
         return Long.compare(cost, o.cost);
     }

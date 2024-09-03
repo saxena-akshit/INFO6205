@@ -14,6 +14,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static edu.neu.coe.info6205.sort.InstrumentedComparatorHelper.INVERSIONS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -28,9 +29,9 @@ public class SelectionSortTest {
         list.add(3);
         list.add(4);
         Integer[] xs = list.toArray(new Integer[0]);
-        final Config config = Config.setupConfig("true", "0", "1", "", "");
+        final Config config = Config.setupConfig("true", "false", "0", "1", "", "");
         int n = list.size();
-        Helper<Integer> helper = HelperFactory.create("SelectionSort", n, config);
+        NonComparableHelper<Integer> helper = HelperFactory.create("SelectionSort", n, config);
         helper.init(n);
         final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
         final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
@@ -38,12 +39,12 @@ public class SelectionSortTest {
         sorter.preProcess(xs);
         Integer[] ys = sorter.sort(xs);
         sorter.postProcess(ys);
-        assertTrue(helper.sorted(ys));
-        final int compares = (int) statPack.getStatistics(InstrumentedHelper.COMPARES).mean();
+        assertTrue(helper.isSorted(ys));
+        final int compares = (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean();
         assertEquals(n * (n - 1) / 2, compares);
-        final int inversions = (int) statPack.getStatistics(InstrumentedHelper.INVERSIONS).mean();
+        final int inversions = (int) statPack.getStatistics(INVERSIONS).mean();
         assertEquals(0L, inversions);
-        final int fixes = (int) statPack.getStatistics(InstrumentedHelper.FIXES).mean();
+        final int fixes = (int) statPack.getStatistics(InstrumentedComparableHelper.FIXES).mean();
         assertEquals(inversions, fixes);
     }
 
@@ -55,17 +56,17 @@ public class SelectionSortTest {
         list.add(2);
         list.add(1);
         Integer[] xs = list.toArray(new Integer[0]);
-        BaseHelper<Integer> helper = new BaseHelper<>("SelectionSort", xs.length, Config.load(SelectionSortTest.class));
-        GenericSort<Integer> sorter = new SelectionSort<Integer>(helper);
+        NonComparableHelper<Integer> helper = new NonInstrumentingComparableHelper<>("SelectionSort", xs.length, Config.load(SelectionSortTest.class));
+        Sort<Integer> sorter = new SelectionSort<Integer>(helper);
         Integer[] ys = sorter.sort(xs);
-        assertTrue(helper.sorted(ys));
+        assertTrue(helper.isSorted(ys));
     }
 
     @Test
     public void sort2() throws Exception {
-        final Config config = Config.setupConfig("true", "0", "1", "", "");
+        final Config config = Config.setupConfig("true", "true", "0", "1", "", "");
         int n = 100;
-        Helper<Integer> helper = HelperFactory.create("SelectionSort", n, config);
+        NonComparableHelper<Integer> helper = HelperFactory.create("SelectionSort", n, config);
         helper.init(n);
         final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
         final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
@@ -74,11 +75,11 @@ public class SelectionSortTest {
         sorter.preProcess(xs);
         Integer[] ys = sorter.sort(xs);
         sorter.postProcess(ys);
-        assertTrue(helper.sorted(ys));
-        final int compares = (int) statPack.getStatistics(InstrumentedHelper.COMPARES).mean();
+        assertTrue(helper.isSorted(ys));
+        final int compares = (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean();
         assertEquals(n * (n - 1) / 2, compares);
-        final int inversions = (int) statPack.getStatistics(InstrumentedHelper.INVERSIONS).mean();
-        final int fixes = (int) statPack.getStatistics(InstrumentedHelper.FIXES).mean();
+        final int inversions = (int) statPack.getStatistics(INVERSIONS).mean();
+        final int fixes = (int) statPack.getStatistics(InstrumentedComparableHelper.FIXES).mean();
         System.out.println(statPack);
         assertEquals(inversions, fixes);
     }

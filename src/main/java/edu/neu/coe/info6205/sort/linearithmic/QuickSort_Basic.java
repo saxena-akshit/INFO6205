@@ -11,7 +11,7 @@ public class QuickSort_Basic<X extends Comparable<X>> extends QuickSort<X> {
     public static final String DESCRIPTION = "QuickSort basic";
 
     public QuickSort_Basic(String description, int N, Config config) {
-        super(description, N, config);
+        super(description, N, 1, config);
         setPartitioner(createPartitioner());
     }
 
@@ -58,31 +58,36 @@ public class QuickSort_Basic<X extends Comparable<X>> extends QuickSort<X> {
          * Method to partition the given partition into smaller partitions.
          *
          * @param partition the partition to divide up.
-         * @return an array of partitions, whose length depends on the sorting method being used.
+         * @return a list of partitions, whose length depends on the sorting method being used.
          */
         public List<Partition<X>> partition(Partition<X> partition) {
             final X[] xs = partition.xs;
             final int from = partition.from;
             final int to = partition.to;
             final int hi = to - 1;
-            X v = xs[from];
+            X v = helper.get(xs, from);
             int i = from;
             int j = to;
             // NOTE: we are trying to avoid checking on instrumented for every time in the inner loop for performance reasons (probably a silly idea).
             // NOTE: if we were using Scala, it would be easy to set up a comparer function and a swapper function. With java, it's possible but much messier.
             if (helper.instrumented()) {
-                helper.incrementHits(1);
                 while (true) {
-                    while (i < hi && helper.less(xs[++i], v)) {}
-                    while (j > from && helper.less(v, xs[--j])) {}
+                    XValue x = new XValue();
+                    while (i < hi && x.update(xs, ++i) && helper.less(x.x, v)) {
+                    }
+                    XValue y = new XValue();
+                    while (j > from && y.update(xs, --j) && helper.less(v, y.x)) {
+                    }
                     if (i >= j) break;
-                    helper.swap(xs, i, j);
+                    helper.swap(xs, x.x, i, j, y.x);
                 }
-                helper.swap(xs, from, j);
+                helper.swap(xs, v, from, j);
             } else {
                 while (true) {
-                    while (i < hi && xs[++i].compareTo(v) < 0) {}
-                    while (j > from && xs[--j].compareTo(v) > 0) {}
+                    while (i < hi && xs[++i].compareTo(v) < 0) {
+                    }
+                    while (j > from && xs[--j].compareTo(v) > 0) {
+                    }
                     if (i >= j) break;
                     swap(xs, i, j);
                 }
@@ -93,6 +98,28 @@ public class QuickSort_Basic<X extends Comparable<X>> extends QuickSort<X> {
             partitions.add(new Partition<>(xs, from, j));
             partitions.add(new Partition<>(xs, j + 1, to));
             return partitions;
+        }
+
+        /**
+         * Auxiliary class to help with the instrumenting case.
+         * In particular, we minimize the number of hits.
+         */
+        class XValue {
+            public boolean update(X[] xs, int i) {
+                helper.incrementHits(1);
+                this.x = xs[i];
+                return true;
+            }
+
+            X x;
+
+            public XValue(X x) {
+                this.x = x;
+            }
+
+            public XValue() {
+                this(null);
+            }
         }
 
         private void swap(X[] ys, int i, int j) {

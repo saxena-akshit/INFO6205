@@ -1,7 +1,7 @@
 package edu.neu.coe.info6205.sort.linearithmic;
 
 import edu.neu.coe.info6205.sort.Helper;
-import edu.neu.coe.info6205.sort.SortWithHelper;
+import edu.neu.coe.info6205.sort.SortWithComparableHelper;
 import edu.neu.coe.info6205.sort.elementary.InsertionSort;
 import edu.neu.coe.info6205.util.Config;
 import edu.neu.coe.info6205.util.LazyLogger;
@@ -9,16 +9,20 @@ import edu.neu.coe.info6205.util.LazyLogger;
 import java.util.Arrays;
 import java.util.Collection;
 
-public abstract class QuickSort<X extends Comparable<X>> extends SortWithHelper<X> {
+public abstract class QuickSort<X extends Comparable<X>> extends SortWithComparableHelper<X> {
 
-    public QuickSort(String description, int N, Config config) {
-        super(description, N, config);
-        insertionSort = new InsertionSort<>(getHelper());
+    public QuickSort(String description, int N, int nRuns, Config config) {
+        super(description, N, nRuns, config);
+        insertionSort = setupInsertionSort(getHelper());
     }
 
     public QuickSort(Helper<X> helper) {
         super(helper);
-        insertionSort = new InsertionSort<>(helper);
+        insertionSort = setupInsertionSort(helper);
+    }
+
+    private InsertionSort<X> setupInsertionSort(final Helper<X> helper) {
+        return new InsertionSort<>(helper.clone("Quicksort: insertion sort"));
     }
 
     /**
@@ -79,7 +83,7 @@ public abstract class QuickSort<X extends Comparable<X>> extends SortWithHelper<
      * @param to   the index of the first element not to sort.
      */
     public void sort(X[] xs, int from, int to) {
-        throw new RuntimeException("This sort signature is not used for Quicksort");
+        sort(xs, from, to, 0);
     }
 
     /**
@@ -93,12 +97,21 @@ public abstract class QuickSort<X extends Comparable<X>> extends SortWithHelper<
      * @return true if there is no further work to be done.
      */
     protected boolean terminator(X[] xs, int from, int to, int depth) {
-        // NOTE: we reduce the cutoff by 1 so that we can use 1 to disable cutoff (because 0 gives the default of 7).
-        if (to <= from + getHelper().cutoff() - 1) {
-            insertionSort.sort(xs, from, to);
+        int n = to - from;
+        if (n <= 1) return true;
+        if (n == 2) {
+            helper.sortPair(xs, from, to);
             return true;
         }
-        return false;
+        if (n == 3) {
+            helper.sortTrio(xs, from, to);
+            return true;
+        }
+        // NOTE: we reduce the cutoff by 1 so that we can use 1 to disable cutoff (because 0 gives the default of 7).
+        int cutoff = Math.max(getHelper().cutoff() - 1, 3); // NOTE it makes no sense to partition an array smaller than 3 elements, regardless of cutoff.
+        if (n > getHelper().cutoff()) return false;
+        insertionSort.sort(xs, from, to);
+        return true;
     }
 
     public InsertionSort<X> getInsertionSort() {

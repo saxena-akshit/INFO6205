@@ -26,6 +26,7 @@ import static edu.neu.coe.info6205.util.Utilities.formatWhole;
 public class SortBenchmarkHelper {
 
     final static LazyLogger logger = new LazyLogger(SortBenchmarkHelper.class);
+    private static final Pattern PATTERN = Pattern.compile("[\\s\\p{Punct}\\uFF0C]");
 
     public static LocalDateTime[] generateRandomLocalDateTimeArray(int number) {
         LocalDateTime[] result = new LocalDateTime[number];
@@ -41,7 +42,7 @@ public class SortBenchmarkHelper {
         List<String> words = new ArrayList<>();
         final FileReader fr = new FileReader(getFile(resource, SortBenchmarkHelper.class));
         for (Object line : new BufferedReader(fr).lines().toArray()) words.addAll(getStrings.apply((String) line));
-        words = words.stream().distinct().filter(new Predicate<String>() {
+        words = words.stream().distinct().filter(new Predicate<>() {
             private static final int MINIMUM_LENGTH = 2;
 
             public boolean test(String s) {
@@ -54,11 +55,17 @@ public class SortBenchmarkHelper {
         return result;
     }
 
-    static Collection<String> getWords(Pattern regex, String line) {
-        final Matcher matcher = regex.matcher(line);
+    /**
+     * CONSIDER making this more efficient. It takes uses a lot of time!
+     *
+     * @param pattern the (regex) pattern to match.
+     * @param line    the line to be matched.
+     * @return a Collection of String.
+     */
+    static Collection<String> getWords(Pattern pattern, String line) {
+        final Matcher matcher = pattern.matcher(line);
         if (matcher.find()) {
-            final String word = matcher.group(1);
-            final String[] strings = word.split("[\\s\\p{Punct}\\uFF0C]");
+            final String[] strings = PATTERN.split(matcher.group(1));
             return Arrays.asList(strings);
         } else
             return new ArrayList<>();

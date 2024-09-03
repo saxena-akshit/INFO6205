@@ -21,7 +21,7 @@ class CoinChanger {
      * @return the minimum number of coins necessary, given the denominations available to this CoinChanger.
      */
     int minimumCoins(int amount) {
-        // In DP we break problem to smaller sub-problems, here this array will store the solution of those sub-problems
+        // In DP, we break problem to smaller sub-problems, here this array will store the solution of those sub-problems
         double[][] arr = new double[denominations.length + 1][amount + 1];
 
         for (int j = 0; j <= amount; j++) {     // Initialising first row with an input of upto positive infinity

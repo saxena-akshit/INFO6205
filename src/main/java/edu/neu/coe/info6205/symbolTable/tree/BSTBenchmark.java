@@ -73,10 +73,7 @@ public class BSTBenchmark<K extends Comparable<K>, V> extends Benchmark_Timer<K[
      */
     public BSTBenchmark(final Class<K> tClass, final BstDetail<K, V> bst, final K[] ks, final int nRuns, final TimeLogger[] timeLoggers, final Stats stats) {
         super("BST benchmark", createPreProcessor(), createExperiment(bst), createPostProcessor(bst, stats));
-        this.tClass = tClass;
-        this.ks = ks;
         this.nRuns = nRuns;
-        this.timeLoggers = timeLoggers;
     }
 
     private static <X> UnaryOperator<X[]> createPreProcessor() {
@@ -111,12 +108,15 @@ public class BSTBenchmark<K extends Comparable<K>, V> extends Benchmark_Timer<K[
 
         @Override
         public String toString() {
-            final StringBuilder sb = new StringBuilder();
-            sb.append("initialNodes: ").append(initialNodes);
-            sb.append(", nodes: ").append(nodes);
-            sb.append(", initialMeanDepth: ").append(formatDecimal3Places(initialMeanDepth));
-            sb.append(", meanDepth: ").append(formatDecimal3Places(meanDepth));
-            return sb.toString();
+            return new StringBuilder().
+                    append("initialNodes: ").
+                    append(initialNodes).
+                    append(", nodes: ").
+                    append(nodes).
+                    append(", initialMeanDepth: ").
+                    append(formatDecimal3Places(initialMeanDepth)).
+                    append(", meanDepth: ").
+                    append(formatDecimal3Places(meanDepth)).toString();
         }
 
         void setMeanDepth(final int nodes, final double meanDepth) {
@@ -133,8 +133,5 @@ public class BSTBenchmark<K extends Comparable<K>, V> extends Benchmark_Timer<K[
 
     final static LazyLogger logger = new LazyLogger(BSTBenchmark.class);
 
-    private final Class<K> tClass;
-    private final K[] ks;
     private final int nRuns;
-    private final TimeLogger[] timeLoggers;
 }

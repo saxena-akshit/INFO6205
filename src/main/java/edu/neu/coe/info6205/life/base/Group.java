@@ -160,7 +160,7 @@ public class Group implements Generational<Group, Void>, Renderable, Countable {
      * Method to create a new generation from this.
      *
      * @param generation the generation id.
-     * @return a new Group, which may possibly overlap with other Groups.
+     * @return a new Group, which may overlap with other Groups.
      */
     Group newGeneration(long generation) {
         Group result = copy(generation);
@@ -248,7 +248,6 @@ public class Group implements Generational<Group, Void>, Renderable, Countable {
      *
      * @return the number of points.
      */
-    @Override
     public int getCount() {
         return points.size();
     }
@@ -259,7 +258,6 @@ public class Group implements Generational<Group, Void>, Renderable, Countable {
      *
      * @return a String.
      */
-    @Override
     public String render() {
         return doRender(true);
     }
@@ -529,7 +527,6 @@ public class Group implements Generational<Group, Void>, Renderable, Countable {
         forEach(this::updateExtents);
     }
 
-    @Override
     public Group generation(BiConsumer<Long, Void> monitor) {
         monitor.accept(generation, null);
         return newGeneration(generation + 1);

@@ -21,13 +21,13 @@ public class TwoSumWithCalipers implements TwoSum {
      */
     public TwoSumWithCalipers(int[] a) {
         this.a = a;
-        length = a.length;
+        int length = a.length;
     }
 
     public Pair[] getPairs() {
         List<Pair> pairs = new ArrayList<>();
         Collections.sort(pairs);
-        pairs.addAll(calipers(a, (t) -> t.sum()));
+        pairs.addAll(calipers(a, Pair::sum));
         return pairs.stream().distinct().toArray(Pair[]::new);
     }
 
@@ -45,5 +45,4 @@ throw new RuntimeException("implementation missing");
     }
 
     private final int[] a;
-    private final int length;
 }

@@ -22,6 +22,7 @@ public class PellTest {
         assertEquals(2378, pell.get(10));
         assertEquals(5741, pell.get(11));
     }
+
     @Test
     public void testGet2() {
         assertEquals(0, new Pell().get(0));
@@ -30,10 +31,12 @@ public class PellTest {
         assertEquals(5, new Pell().get(3));
         assertEquals(124145519261542L, new Pell().get(38));
     }
+
     @Test
     public void testGet3() {
         assertEquals(4866752642924153522L, new Pell().get(50));
     }
+
     @Test
     public void testGet4() {
         assertEquals(7052354271195710746L, new Pell().get(90));

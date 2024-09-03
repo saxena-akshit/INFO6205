@@ -3,9 +3,9 @@
  */
 package edu.neu.coe.info6205.sort.elementary;
 
-import edu.neu.coe.info6205.sort.BaseHelper;
 import edu.neu.coe.info6205.sort.Helper;
-import edu.neu.coe.info6205.sort.SortWithHelper;
+import edu.neu.coe.info6205.sort.NonInstrumentingComparableHelper;
+import edu.neu.coe.info6205.sort.SortWithComparableHelper;
 import edu.neu.coe.info6205.util.Config;
 import edu.neu.coe.info6205.util.QuickRandom;
 import edu.neu.coe.info6205.util.Utilities;
@@ -22,7 +22,7 @@ import java.io.IOException;
  *
  * @param <X> the type of element on which we will be sorting (must implement Comparable).
  */
-public class RandomSort<X extends Comparable<X>> extends SortWithHelper<X> {
+public class RandomSort<X extends Comparable<X>> extends SortWithComparableHelper<X> {
 
     /**
      * Constructor for RandomSort
@@ -31,11 +31,11 @@ public class RandomSort<X extends Comparable<X>> extends SortWithHelper<X> {
      * @param config the configuration.
      */
     public RandomSort(int N, Config config) {
-        super(DESCRIPTION, N, config);
+        super(DESCRIPTION, N, 1, config);
     }
 
     public RandomSort() throws IOException {
-        this(new BaseHelper<>(DESCRIPTION, Config.load(RandomSort.class)));
+        this(new NonInstrumentingComparableHelper<>(DESCRIPTION, Config.load(RandomSort.class)));
     }
 
 
@@ -59,7 +59,7 @@ public class RandomSort<X extends Comparable<X>> extends SortWithHelper<X> {
         final Helper<X> helper = getHelper();
         boolean instrumented = helper.instrumented();
         QuickRandom r = new QuickRandom(N);
-        int inversions = instrumented ? helper.inversions(xs) : 0;
+        long inversions = instrumented ? helper.inversions(xs) : 0;
         if (N > CUTOFF) {
             int m = (int) (FACTOR * Utilities.lg(N) * N);
             for (int i = m; i > 0; i--) {
@@ -68,8 +68,8 @@ public class RandomSort<X extends Comparable<X>> extends SortWithHelper<X> {
                 helper.swapConditional(xs, j, r.get());
             }
             if (instrumented) {
-                final int currentInversions = helper.inversions(xs);
-                final int fixes = inversions - currentInversions;
+                final long currentInversions = helper.inversions(xs);
+                final long fixes = inversions - currentInversions;
                 inversions = currentInversions;
                 System.out.println("pre-processor: inversions=" + currentInversions + ", fixes=" + fixes + ", comparisons=" + m);
             }
@@ -78,8 +78,8 @@ public class RandomSort<X extends Comparable<X>> extends SortWithHelper<X> {
         if (instrumented) {
             String s = helper.showStats();
             System.out.println("after insertion sort: " + s);
-            final int currentInversions = helper.inversions(xs);
-            final int fixes = inversions - currentInversions;
+            final long currentInversions = helper.inversions(xs);
+            final long fixes = inversions - currentInversions;
             System.out.println("insertion sort: inversions=" + currentInversions + ", fixes=" + fixes);
         }
     }
@@ -87,7 +87,9 @@ public class RandomSort<X extends Comparable<X>> extends SortWithHelper<X> {
     public static final String DESCRIPTION = "Random sort";
 
     public static <T extends Comparable<T>> void sort(T[] ts) throws IOException {
-        new RandomSort<T>().mutatingSort(ts);
+        try (RandomSort<T> sort = new RandomSort<>()) {
+            sort.mutatingSort(ts);
+        }
     }
 
     /**

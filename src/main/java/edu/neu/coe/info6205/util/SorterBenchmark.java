@@ -19,19 +19,23 @@ public class SorterBenchmark<T extends Comparable<T>> extends Benchmark_Timer<T[
     /**
      * Run a benchmark on a sorting problem with N elements.
      *
-     * @param N the number of elements.
-     *          Not to be confused with nRuns, an instance field, which specifies the number of repetitions of the function.
+     * @param description the description of the task being timed.
+     * @param N           the number of elements.
+     *                    Not to be confused with nRuns, an instance field, which specifies the number of repetitions of the function.
      */
-    public void run(int N) {
-        logger.info("run: sort " + formatWhole(N) + " elements using " + this);
-        sorter.init(N);
-        final double time = super.runFromSupplier(() -> generateRandomArray(ts), nRuns);
-        for (TimeLogger timeLogger : timeLoggers) timeLogger.log(time, N);
+    public void run(String description, int N) {
+        if (nRuns > 0) {
+            logger.info("run: sort " + formatWhole(N) + " elements with " + this);
+            sorter.init(N);
+            final double time = super.runFromSupplier(() -> generateRandomArray(ts), nRuns);
+            for (TimeLogger timeLogger : timeLoggers) timeLogger.log(description, time, N);
+        } else
+            logger.warn("run: skipping " + this);
     }
 
     @Override
     public String toString() {
-        return "SorterBenchmark on " + tClass + " from " + formatWhole(ts.length) + " total elements and " + formatWhole(nRuns) + " runs using sorter: " + sorter.getHelper().getDescription();
+        return "SorterBenchmark on " + tClass + " from " + formatWhole(ts.length) + " total elements and " + formatWhole(nRuns) + " runs";
     }
 
     /**

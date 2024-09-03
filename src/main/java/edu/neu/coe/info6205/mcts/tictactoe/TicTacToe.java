@@ -169,7 +169,7 @@ public class TicTacToe implements Game<TicTacToe> {
         /**
          * Method to determine if this State represents the end of the game?
          *
-         * @return true if this State is a win/loss/draw.
+         * @return an optional int if this State is a win/loss/draw.
          */
         public Optional<Integer> winner() {
             return position.winner();

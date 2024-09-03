@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 final class Either<L, R> {
     public static <L, R> Either<L, R> left(L value) {
         return new Either<>(Optional.of(value), Optional.empty());
@@ -14,7 +15,7 @@ final class Either<L, R> {
     }
 
     public boolean isRight() {
-        return right.isPresent() && !left.isPresent();
+        return right.isPresent() && left.isEmpty();
     }
 
     /**
@@ -46,6 +47,7 @@ final class Either<L, R> {
     public <T> T map(
             Function<? super L, ? extends T> lFunc,
             Function<? super R, ? extends T> rFunc) {
+        // TODO sort this out.
         return left.<T>map(lFunc).orElseGet(() -> right.map(rFunc).orElseGet(null));
     }
 

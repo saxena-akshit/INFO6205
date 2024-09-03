@@ -1,6 +1,7 @@
 package edu.neu.coe.info6205.util;
 
-import edu.neu.coe.info6205.sort.InstrumentedHelper;
+import edu.neu.coe.info6205.sort.InstrumentedComparableHelper;
+import edu.neu.coe.info6205.sort.Instrumenter;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -20,24 +21,24 @@ public class ConfigTest {
 
     @Test
     public void testConfigFixed() {
-        final Config config = Config.setupConfig(TRUE, "0", "10", "", "");
+        final Config config = Config.setupConfig(TRUE, "false", "0", "10", "", "");
         assertTrue(config.isInstrumented());
-        assertEquals(0L, config.getLong(Config.HELPER, SEED, -1L));
+        assertEquals(0L, config.getSeed());
         assertEquals(10, config.getInt(INSTRUMENTING, INVERSIONS, 0));
     }
 
     @Test
     public void testCopy1() {
-        final Config config = Config.setupConfig(FALSE, "", "", "", "");
-        int originalSeed = config.getInt(Config.HELPER, SEED, -1);
+        final Config config = Config.setupConfig(FALSE, "false", "0", "", "", "");
+        long originalSeed = config.getSeed();
         Config config1 = config.copy(Config.HELPER, SEED, "1");
-        assertEquals(originalSeed, config.getInt(Config.HELPER, SEED, -1));
-        assertEquals(1, config1.getInt(Config.HELPER, SEED, -1));
+        assertEquals(originalSeed, config.getSeed());
+        assertEquals(1, config1.getSeed());
     }
 
     @Test
     public void testCopy2() {
-        final Config config = Config.setupConfig(FALSE, "", "", "", "");
+        final Config config = Config.setupConfig(FALSE, "false", "", "", "", "");
         String junk = "junk";
         assertEquals(-1, config.getInt(Config.HELPER, junk, -1));
         Config config1 = config.copy(Config.HELPER, junk, "1");
@@ -55,12 +56,12 @@ public class ConfigTest {
 
     public static final String TRUE = "true";
     public static final String FALSE = "";
-    public static final String INSTRUMENTING = InstrumentedHelper.INSTRUMENTING;
-    public static final String INVERSIONS = InstrumentedHelper.INVERSIONS;
-    public static final String SWAPS = InstrumentedHelper.SWAPS;
-    public static final String COMPARES = InstrumentedHelper.COMPARES;
-    public static final String COPIES = InstrumentedHelper.COPIES;
-    public static final String FIXES = InstrumentedHelper.FIXES;
+    public static final String INSTRUMENTING = InstrumentedComparableHelper.INSTRUMENTING;
+    public static final String INVERSIONS = Instrumenter.INVERSIONS;
+    public static final String SWAPS = InstrumentedComparableHelper.SWAPS;
+    public static final String COMPARES = InstrumentedComparableHelper.COMPARES;
+    public static final String COPIES = InstrumentedComparableHelper.COPIES;
+    public static final String FIXES = InstrumentedComparableHelper.FIXES;
     public static final String INSURANCE = "";
     public static final String NOCOPY = "";
 }

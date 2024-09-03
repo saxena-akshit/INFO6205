@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static edu.neu.coe.info6205.sort.InstrumentedComparatorHelper.INVERSIONS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -29,21 +30,21 @@ public class RandomSortTest {
         list.add(3);
         list.add(4);
         Integer[] xs = list.toArray(new Integer[0]);
-        final Config config = Config.setupConfig("true", "0", "1", "", "");
-        Helper<Integer> helper = HelperFactory.create("RandomSort", list.size(), config);
+        final Config config = Config.setupConfig("true", "false", "0", "1", "", "");
+        NonComparableHelper<Integer> helper = HelperFactory.create("RandomSort", list.size(), config);
         helper.init(list.size());
         final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
         final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
         SortWithHelper<Integer> sorter = new RandomSort<Integer>(helper);
         sorter.preProcess(xs);
         Integer[] ys = sorter.sort(xs);
-        assertTrue(helper.sorted(ys));
+        assertTrue(helper.isSorted(ys));
         sorter.postProcess(ys);
-        final int compares = (int) statPack.getStatistics(InstrumentedHelper.COMPARES).mean();
+        final int compares = (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean();
         assertEquals(list.size() - 1, compares);
-        final int inversions = (int) statPack.getStatistics(InstrumentedHelper.INVERSIONS).mean();
+        final int inversions = (int) statPack.getStatistics(INVERSIONS).mean();
         assertEquals(0L, inversions);
-        final int fixes = (int) statPack.getStatistics(InstrumentedHelper.FIXES).mean();
+        final int fixes = (int) statPack.getStatistics(InstrumentedComparableHelper.FIXES).mean();
         assertEquals(inversions, fixes);
     }
 
@@ -55,10 +56,10 @@ public class RandomSortTest {
         list.add(2);
         list.add(1);
         Integer[] xs = list.toArray(new Integer[0]);
-        BaseHelper<Integer> helper = new BaseHelper<>("RandomSort", xs.length, Config.load(RandomSortTest.class));
-        GenericSort<Integer> sorter = new RandomSort<Integer>(helper);
+        NonComparableHelper<Integer> helper = new NonInstrumentingComparableHelper<>("RandomSort", xs.length, Config.load(RandomSortTest.class));
+        Sort<Integer> sorter = new RandomSort<Integer>(helper);
         Integer[] ys = sorter.sort(xs);
-        assertTrue(helper.sorted(ys));
+        assertTrue(helper.isSorted(ys));
         System.out.println(sorter.toString());
     }
 
@@ -70,10 +71,10 @@ public class RandomSortTest {
         list.add(2);
         list.add(1);
         Integer[] xs = list.toArray(new Integer[0]);
-        BaseHelper<Integer> helper = new BaseHelper<>("RandomSort", xs.length, Config.load(RandomSortTest.class));
-        GenericSort<Integer> sorter = new RandomSort<Integer>(helper);
+        NonComparableHelper<Integer> helper = new NonInstrumentingComparableHelper<>("RandomSort", xs.length, Config.load(RandomSortTest.class));
+        Sort<Integer> sorter = new RandomSort<Integer>(helper);
         sorter.mutatingSort(xs);
-        assertTrue(helper.sorted(xs));
+        assertTrue(helper.isSorted(xs));
     }
 
     @Test
@@ -90,9 +91,9 @@ public class RandomSortTest {
 
     @Test
     public void sort2() throws Exception {
-        final Config config = Config.setupConfig("true", "0", "1", "", "");
+        final Config config = Config.setupConfig("true", "true", "0", "1", "", "");
         int n = 100;
-        Helper<Integer> helper = HelperFactory.create("RandomSort", n, 0L, config);
+        NonComparableHelper<Integer> helper = HelperFactory.create("RandomSort", n, 0L, 1, config);
         helper.init(n);
         System.out.println(helper.toString());
         final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
@@ -101,16 +102,16 @@ public class RandomSortTest {
         SortWithHelper<Integer> sorter = new RandomSort<Integer>(helper);
         sorter.preProcess(xs);
         Integer[] ys = sorter.sort(xs);
-        assertTrue(helper.sorted(ys));
+        assertTrue(helper.isSorted(ys));
         sorter.postProcess(ys);
-        final int compares = (int) statPack.getStatistics(InstrumentedHelper.COMPARES).mean();
+        final int compares = (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean();
         // NOTE: these are suppoed to match within about 12%.
         // Since we set a specific seed, this should always succeed.
         // If we use true random seed and this test fails, just increase the delta a little.
 //        assertEquals(1.0, 4.0 * compares / n / (n - 1), 0.12);
         System.out.println("comparisons: " + compares);
-        final int inversions = (int) statPack.getStatistics(InstrumentedHelper.INVERSIONS).mean();
-        final int fixes = (int) statPack.getStatistics(InstrumentedHelper.FIXES).mean();
+        final int inversions = (int) statPack.getStatistics(INVERSIONS).mean();
+        final int fixes = (int) statPack.getStatistics(InstrumentedComparableHelper.FIXES).mean();
         System.out.println(statPack);
         // FIXME this may fail if there are duplicate elements in the array.
         assertEquals(inversions, fixes);
@@ -118,9 +119,9 @@ public class RandomSortTest {
 
     @Test
     public void sort3() throws Exception {
-        final Config config = Config.setupConfig("true", "0", "1", "", "");
+        final Config config = Config.setupConfig("true", "true", "0", "1", "", "");
         int n = 100;
-        Helper<Integer> helper = HelperFactory.create("RandomSort", n, config);
+        NonComparableHelper<Integer> helper = HelperFactory.create("RandomSort", n, config);
         helper.init(n);
         System.out.println(helper.toString());
         final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
@@ -130,16 +131,16 @@ public class RandomSortTest {
         SortWithHelper<Integer> sorter = new RandomSort<Integer>(helper);
         sorter.preProcess(xs);
         Integer[] ys = sorter.sort(xs);
-        assertTrue(helper.sorted(ys));
+        assertTrue(helper.isSorted(ys));
         sorter.postProcess(ys);
-        final int compares = (int) statPack.getStatistics(InstrumentedHelper.COMPARES).mean();
+        final int compares = (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean();
         // NOTE: these are suppoed to match within about 12%.
         // Since we set a specific seed, this should always succeed.
         // If we use true random seed and this test fails, just increase the delta a little.
 //        assertEquals(4950, compares);
         System.out.println("comparisons: " + compares);
-        final int inversions = (int) statPack.getStatistics(InstrumentedHelper.INVERSIONS).mean();
-        final int fixes = (int) statPack.getStatistics(InstrumentedHelper.FIXES).mean();
+        final int inversions = (int) statPack.getStatistics(INVERSIONS).mean();
+        final int fixes = (int) statPack.getStatistics(InstrumentedComparableHelper.FIXES).mean();
         System.out.println(statPack);
         assertEquals(inversions, fixes);
     }

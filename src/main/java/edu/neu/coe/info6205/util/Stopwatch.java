@@ -7,6 +7,7 @@ package edu.neu.coe.info6205.util;
  * <p>
  * Once the Stopwatch is started (i.e. constructed), you "read" the stopwatch by calling lap(),
  * which returns the number of milliseconds since the previous lap (or since the start).
+ * <p>NOTE that Stopwatch is not intended for long laps because it lacks the required precision.</p>
  */
 public class Stopwatch implements AutoCloseable {
 
@@ -25,7 +26,7 @@ public class Stopwatch implements AutoCloseable {
         assert start != null : "Stopwatch is closed";
         final long lapStart = start;
         start = System.nanoTime();
-        return (start - lapStart) / 1000000;
+        return (start / MILLION - lapStart / MILLION);
     }
 
     /**
@@ -35,6 +36,8 @@ public class Stopwatch implements AutoCloseable {
     public void close() {
         start = null;
     }
+
+    public static final int MILLION = 1_000_000;
 
     private Long start;
 }

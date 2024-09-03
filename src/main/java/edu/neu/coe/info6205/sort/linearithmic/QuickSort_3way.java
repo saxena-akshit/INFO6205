@@ -1,8 +1,8 @@
 package edu.neu.coe.info6205.sort.linearithmic;
 
-import edu.neu.coe.info6205.sort.BaseHelper;
 import edu.neu.coe.info6205.sort.Helper;
-import edu.neu.coe.info6205.sort.InstrumentedHelper;
+import edu.neu.coe.info6205.sort.InstrumentedComparableHelper;
+import edu.neu.coe.info6205.sort.NonInstrumentingComparableHelper;
 import edu.neu.coe.info6205.util.Config;
 
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public class QuickSort_3way<X extends Comparable<X>> extends QuickSort<X> {
 
-    public static final String DESCRIPTION = "QuickSort 3 way";
+    public static final String DESCRIPTION = "QuickSort three way";
 
     /**
      * Constructor for QuickSort_3way
@@ -23,7 +23,7 @@ public class QuickSort_3way<X extends Comparable<X>> extends QuickSort<X> {
     }
 
     public QuickSort_3way(Config config) {
-        this(new BaseHelper<>(DESCRIPTION, config));
+        this(new NonInstrumentingComparableHelper<X>(DESCRIPTION, config));
     }
 
     /**
@@ -33,7 +33,7 @@ public class QuickSort_3way<X extends Comparable<X>> extends QuickSort<X> {
      * @param config the configuration.
      */
     public QuickSort_3way(int N, Config config) {
-        super(DESCRIPTION, N, config);
+        super(DESCRIPTION, N, 1, config);
         setPartitioner(createPartitioner());
     }
 
@@ -41,12 +41,12 @@ public class QuickSort_3way<X extends Comparable<X>> extends QuickSort<X> {
      * Constructor for QuickSort_3way which always uses an instrumented helper with a specific seed.
      * <p>
      * NOTE used by unit tests.
+     *  @param N    the number of elements to be sorted.
      *
-     * @param N    the number of elements to be sorted.
      * @param seed the seed for the random number generator.
      */
     public QuickSort_3way(int N, long seed, Config config) {
-        this(new InstrumentedHelper<>(DESCRIPTION, N, config));
+        this(new InstrumentedComparableHelper<>(DESCRIPTION, N, seed, config));
     }
 
     public Partitioner<X> createPartitioner() {
@@ -59,25 +59,35 @@ public class QuickSort_3way<X extends Comparable<X>> extends QuickSort<X> {
          * Method to partition the given partition into smaller partitions.
          *
          * @param partition the partition to divide up.
-         * @return an array of partitions, whose length depends on the sorting method being used.
+         * @return a list of partitions, whose length depends on the sorting method being used.
          */
         public List<Partition<X>> partition(Partition<X> partition) {
-            // CONSIDER merge with Partitioner_DualPivot
             X[] xs = partition.xs;
             int lt = partition.from;
             int gt = partition.to - 1;
-            helper.swapConditional(xs, lt, gt);
-            X v = xs[lt];
+            helper.swapConditional(xs, lt, gt); // one compare; one or zero swaps, four or six hits.
+            X v = xs[lt]; // no hit because we already got this value in the previous statement.
             int i = lt + 1;
             // NOTE: we are trying to avoid checking on instrumented for every time in the inner loop for performance reasons (probably a silly idea).
             // NOTE: if we were using Scala, it would be easy to set up a comparer function and a swapper function. With java, it's possible but much messier.
-            if (helper.instrumented())
+            if (helper.instrumented()) {
+                X xlt = v;
+                X xgt = xs[gt]; // no hit because we already got this value in the previous statement.
                 while (i <= gt) {
-                    int cmp = helper.compare(xs[i], v);
-                    if (cmp < 0) helper.swap(xs, lt++, i++);
-                    else if (cmp > 0) helper.swap(xs, i, gt--);
-                    else i++;
+                    X xi = helper.get(xs, i); // one hit
+                    if (i == lt) i++;
+                    else {
+                        int cmp = helper.compare(xi, v); // one compare
+                        if (cmp < 0) {
+                            helper.swap(xs, xlt, lt++, i++, xi); // one swap
+                            xlt = helper.get(xs, lt); // one hit
+                        } else if (cmp > 0) {
+                            helper.swap(xs, xi, i, gt--, xgt); // one swap
+                            xgt = helper.get(xs, gt); // one hit
+                        } else i++; // no statistics affected
+                    }
                 }
+            }
             else
                 while (i <= gt) {
                     int cmp = xs[i].compareTo(v);
@@ -97,12 +107,9 @@ public class QuickSort_3way<X extends Comparable<X>> extends QuickSort<X> {
         }
 
         private void swap(X[] ys, int i, int j) {
-            if (helper != null) helper.swap(ys, i, j);
-            else {
-                X temp = ys[i];
-                ys[i] = ys[j];
-                ys[j] = temp;
-            }
+            X temp = ys[i];
+            ys[i] = ys[j];
+            ys[j] = temp;
         }
 
         private final Helper<X> helper;

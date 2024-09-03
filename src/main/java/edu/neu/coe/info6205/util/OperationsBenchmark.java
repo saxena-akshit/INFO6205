@@ -1,7 +1,7 @@
 package edu.neu.coe.info6205.util;
 
-import edu.neu.coe.info6205.sort.BaseHelper;
 import edu.neu.coe.info6205.sort.Helper;
+import edu.neu.coe.info6205.sort.NonInstrumentingComparableHelper;
 
 import java.io.IOException;
 import java.util.Random;
@@ -25,19 +25,22 @@ public class OperationsBenchmark {
 
     /**
      * This benchmark is designed to determine the cost of visiting every element of an array of Integers.
-     * It's awkward to do the same thing with primitive ints so I'll leave that until later.
+     * It's awkward to do the same thing with primitive ints, so I'll leave that until later.
      */
     private void runLargestInteger() {
         final int nLargest = config.getInt("operationsbenchmark", "nlargest", DEFAULT_ARRAY_SIZE);
         final int repetitions = config.getInt("operationsbenchmark", "repetitions", 1000);
         logger.info("OperationsBenchmark.runBenchmarks: largest " + nLargest + " integers with " + repetitions + " repetitions");
-        final Helper<Integer> helper = new BaseHelper<>("largest", nLargest, 0L, config);
-        final Timer timer = new Timer();
-        final double time = timer.repeat(repetitions,
-                () -> getRandomIntegers(helper),
-                OperationsBenchmark::findLargest
-        );
-        for (TimeLogger timeLogger : timeLoggersLinear) timeLogger.log(time, nLargest);
+
+        try (
+                final Helper<Integer> helper = new NonInstrumentingComparableHelper<>("largest", nLargest, 0L, config)) {
+            final Timer timer = new Timer();
+            final double time = timer.repeat(repetitions,
+                    () -> getRandomIntegers(helper),
+                    OperationsBenchmark::findLargest
+            );
+            for (TimeLogger timeLogger : timeLoggersLinear) timeLogger.log("Operations", time, nLargest);
+        }
     }
 
     /**
@@ -47,13 +50,14 @@ public class OperationsBenchmark {
         final int nCompareAdjacent = config.getInt("operationsbenchmark", "ncompareadjacent", DEFAULT_ARRAY_SIZE);
         final int repetitions = config.getInt("operationsbenchmark", "repetitions", 1000);
         logger.info("OperationsBenchmark.runBenchmarks: compareAdjacent " + nCompareAdjacent + " integers with " + repetitions + " repetitions");
-        final Helper<Integer> helper = new BaseHelper<>("compareAdjacent", nCompareAdjacent, 0L, config);
-        final Timer timer = new Timer();
-        final double time = timer.repeat(repetitions,
-                () -> getRandomIntegers(helper),
-                OperationsBenchmark::compareAdjacent
-        );
-        for (TimeLogger timeLogger : timeLoggersLinear) timeLogger.log(time, nCompareAdjacent);
+        try (final Helper<Integer> helper = new NonInstrumentingComparableHelper<>("compareAdjacent", nCompareAdjacent, 0L, config)) {
+            final Timer timer = new Timer();
+            final double time = timer.repeat(repetitions,
+                    () -> getRandomIntegers(helper),
+                    OperationsBenchmark::compareAdjacent
+            );
+            for (TimeLogger timeLogger : timeLoggersLinear) timeLogger.log("Operations", time, nCompareAdjacent);
+        }
     }
 
     /**
@@ -63,13 +67,14 @@ public class OperationsBenchmark {
         final int nCompareAdjacent = config.getInt("operationsbenchmark", "ncompareadjacent", DEFAULT_ARRAY_SIZE);
         final int repetitions = config.getInt("operationsbenchmark", "repetitions", 1000);
         logger.info("OperationsBenchmark.runBenchmarks: compareAdjacentOptimized " + nCompareAdjacent + " integers with " + repetitions + " repetitions");
-        final Helper<Integer> helper = new BaseHelper<>("compareAdjacent", nCompareAdjacent, 0L, config);
-        final Timer timer = new Timer();
-        final double time = timer.repeat(repetitions,
-                () -> getRandomIntegers(helper),
-                OperationsBenchmark::compareAdjacentOptimized
-        );
-        for (TimeLogger timeLogger : timeLoggersLinear) timeLogger.log(time, nCompareAdjacent);
+        try (final Helper<Integer> helper = new NonInstrumentingComparableHelper<>("compareAdjacent", nCompareAdjacent, 0L, config)) {
+            final Timer timer = new Timer();
+            final double time = timer.repeat(repetitions,
+                    () -> getRandomIntegers(helper),
+                    OperationsBenchmark::compareAdjacentOptimized
+            );
+            for (TimeLogger timeLogger : timeLoggersLinear) timeLogger.log("Operations", time, nCompareAdjacent);
+        }
     }
 
     private Integer[] getRandomIntegers(Helper<Integer> helper) {
@@ -97,13 +102,15 @@ public class OperationsBenchmark {
         for (int i = 1; i < xs.length; i++) {
             final int y = xs[i];
             inversions = inversions | x > y;
+            //noinspection SuspiciousNameCombination
             x = y;
         }
         return inversions;
     }
+
     private final static TimeLogger[] timeLoggersLinear = {
-            new TimeLogger("Raw time per run (mSec): ", (time, n) -> time),
-            new TimeLogger("Normalized time per run (n): ", (time, n) -> time / n * 1e6)
+            new TimeLogger("Raw time per run (mSec): ", null),
+            new TimeLogger("Normalized time per run (n): ", n -> n * 1.0)
     };
 
     final static LazyLogger logger = new LazyLogger(OperationsBenchmark.class);

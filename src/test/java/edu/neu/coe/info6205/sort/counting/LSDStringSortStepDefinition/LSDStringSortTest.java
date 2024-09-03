@@ -1,47 +1,62 @@
 package edu.neu.coe.info6205.sort.counting.LSDStringSortStepDefinition;
 
 
+import com.google.common.collect.ImmutableList;
+import edu.neu.coe.info6205.sort.Sort;
 import edu.neu.coe.info6205.sort.counting.LSDStringSort;
-import io.cucumber.java.Before;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
+import edu.neu.coe.info6205.util.Config;
+import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import java.io.IOException;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertArrayEquals;
 
 public class LSDStringSortTest {
 
-    private LSDStringSort ls;
-    private String[] strArr;
+    // TODO add tests which test numbers of hits, lookups, etc.
 
-    @Before
-    public void init() {
-        ls = new LSDStringSort();
-    }
-
-    @Given("the {string} array of String {string}")
-    public void the_array_of_String(String string, String string2) {
-        // Write code here that turns the phrase above into concrete actions
-        strArr = string2.split(",");
-    }
-
-    @When("LSD Radix sort is performed within {int} and {int}")
-    public void lsd_Radix_sort_is_performed_within_and(Integer rangeStart, Integer rangeEnd) {
-        // Write code here that turns the phrase above into concrete actions
-        ls.sort(strArr, rangeStart, rangeEnd);
-    }
-
-    @Then("validate if the elements within {int} and {int} statisfy sorting invariance")
-    public void validate_if_the_elements_within_and_statisfy_sorting_invariance(Integer rangeStart, Integer rangeEnd) {
-        // Write code here that turns the phrase above into concrete actions
-        assertTrue(stringSortingInvarianceCheck(rangeStart, rangeEnd));
-    }
-
-    public boolean stringSortingInvarianceCheck(int rangeStart, int rangeEnd) {
-        for (int i = rangeStart + 1; i <= rangeEnd; i++) {
-            if (strArr[i - 1].compareTo(strArr[i]) > 0) return false;
+    @Test
+    public void testSort0() throws IOException {
+        ImmutableList<String> list = ImmutableList.of("Bravos", "Campion", "Ablexx", "Aardva", "Beetle");
+        try (Sort<String> sorter = new LSDStringSort(list.size(), 0, LSDStringSort.comparatorASCII, 1, Config.load(LSDStringSort.class))) {
+            String[] xs = list.toArray(new String[]{});
+            sorter.mutatingSort(xs);
+            System.out.println(Arrays.toString(xs));
+            assertArrayEquals(new String[]{"Aardva", "Ablexx", "Beetle", "Bravos", "Campion"}, xs);
         }
-        return true;
     }
 
+    @Test
+    public void testSort1() throws IOException {
+        ImmutableList<String> list = ImmutableList.of("Bravos", "Campion", "Ablexx", "Aardva", "Beetle");
+        try (Sort<String> sorter = new LSDStringSort(list.size(), 0, LSDStringSort.comparatorASCII, 1, Config.load(LSDStringSort.class))) {
+            String[] xs = list.toArray(new String[]{});
+            sorter.mutatingSort(xs);
+            System.out.println(Arrays.toString(xs));
+            assertArrayEquals(new String[]{"Aardva", "Ablexx", "Beetle", "Bravos", "Campion"}, xs);
+        }
+    }
+
+    @Test
+    public void testSort2() throws IOException {
+        ImmutableList<String> list = ImmutableList.of("Bravos", "Campion", "Ablexx", "Aardva", "Beetle", "C     ");
+        try (Sort<String> sorter = new LSDStringSort(list.size(), 0, LSDStringSort.comparatorASCII, 1, Config.load(LSDStringSort.class))) {
+            String[] xs = list.toArray(new String[]{});
+            sorter.mutatingSort(xs);
+            System.out.println(Arrays.toString(xs));
+            assertArrayEquals(new String[]{"Aardva", "Ablexx", "Beetle", "Bravos", "C     ", "Campion"}, xs);
+        }
+    }
+
+    //        @Test  // Need to do implement case-independent comparisons (as an option) in LSDStringSort,
+    public void testSort4() throws IOException {
+        ImmutableList<String> list = ImmutableList.of("Bravos", "Campion", "Ablexx", "Aardva", "Beetle", "c     ");
+        try (Sort<String> sorter = new LSDStringSort(list.size(), 0, LSDStringSort.comparatorASCII, 1, Config.load(LSDStringSort.class))) {
+            String[] xs = list.toArray(new String[]{});
+            sorter.mutatingSort(xs);
+            System.out.println(Arrays.toString(xs));
+            assertArrayEquals(new String[]{"Aardva", "Ablexx", "Beetle", "Bravos", "c     ", "Campion"}, xs);
+        }
+    }
 }

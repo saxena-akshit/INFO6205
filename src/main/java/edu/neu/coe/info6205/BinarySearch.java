@@ -23,10 +23,10 @@ public class BinarySearch {
     /**
      * Method to do binary search.
      *
-     * @param a   the ordered array.
+     * @param a    the ordered array.
      * @param from the first index on interest.
-     * @param to  the first subsequent index that is NOT of interest.
-     * @param key the value we are searching for.
+     * @param to   the first subsequent index that is NOT of interest.
+     * @param key  the value we are searching for.
      * @return the index of the element whose value is <code>key</code>, or null if there is no such element.
      */
     static int binarySearch(int[] a, int from, int to, int key) {

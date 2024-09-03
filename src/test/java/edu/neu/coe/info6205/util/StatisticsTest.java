@@ -9,7 +9,7 @@ public class StatisticsTest {
 
     @Test
     public void testAdd() {
-        final Statistics statistics = new Statistics("test", x -> x * 1.0, 10);
+        final Statistics statistics = new Statistics("test", x -> x * 1.0, 3, 1);
         statistics.add(-1);
         statistics.add(0);
         statistics.add(1);
@@ -18,7 +18,7 @@ public class StatisticsTest {
 
     @Test
     public void testMean() {
-        final Statistics statistics = new Statistics("test", x -> x * 1.0, 10);
+        final Statistics statistics = new Statistics("test", x -> x * 1.0, 4, 1);
         statistics.add(-1);
         statistics.add(0);
         statistics.add(1);
@@ -28,7 +28,7 @@ public class StatisticsTest {
 
     @Test
     public void testStdDev() {
-        final Statistics statistics = new Statistics("test", x -> x * 1.0, 10);
+        final Statistics statistics = new Statistics("test", x -> x * 1.0, 4, 1);
         statistics.add(-1);
         statistics.add(0);
         statistics.add(1);
@@ -38,18 +38,18 @@ public class StatisticsTest {
 
     @Test
     public void testToString() {
-        final Statistics statistics = new Statistics("test", Statistics.NORMALIZER_LINEARITHMIC_NATURAL, 10);
+        final Statistics statistics = new Statistics("test", Statistics.NORMALIZER_LINEARITHMIC_NATURAL, 4, 2);
         statistics.add(-1);
         statistics.add(0);
         statistics.add(1);
         statistics.add(4);
-        assertEquals("test: mean=1; stdDev=2, normalized=0.043", statistics.toString());
+        assertEquals("test: mean=1; stdDev=2; normalized=0.721", statistics.toString());
     }
 
     @Test
     public void testNormalizedMean() {
-        int n = 10;
-        final Statistics statistics = new Statistics("test", Statistics.NORMALIZER_LINEARITHMIC_NATURAL, n);
+        int n = 2;
+        final Statistics statistics = new Statistics("test", Statistics.NORMALIZER_LINEARITHMIC_NATURAL, n, 2);
         statistics.add(0);
         statistics.add(2);
         assertEquals(1.0 / n / Math.log(n), statistics.normalizedMean(), 1E-10);

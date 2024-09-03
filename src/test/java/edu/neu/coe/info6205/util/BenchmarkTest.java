@@ -18,7 +18,7 @@ public class BenchmarkTest {
     @Test // Slow
     public void testWaitPeriods() throws Exception {
         int nRuns = 2;
-        int warmups = 2;
+        int warmups = 1;
         Benchmark<Boolean> bm = new Benchmark_Timer<>(
                 "testWaitPeriods", b -> {
             GoToSleep(100L, -1);
@@ -50,10 +50,10 @@ public class BenchmarkTest {
 
     @Test
     public void getWarmupRuns() {
-        assertEquals(2, Benchmark_Timer.getWarmupRuns(0));
-        assertEquals(2, Benchmark_Timer.getWarmupRuns(20));
+        assertEquals(1, Benchmark_Timer.getWarmupRuns(0));
+        assertEquals(1, Benchmark_Timer.getWarmupRuns(20));
         assertEquals(3, Benchmark_Timer.getWarmupRuns(45));
-        assertEquals(6, Benchmark_Timer.getWarmupRuns(100));
-        assertEquals(6, Benchmark_Timer.getWarmupRuns(1000));
+        assertEquals(4, Benchmark_Timer.getWarmupRuns(100));
+        assertEquals(4, Benchmark_Timer.getWarmupRuns(1000));
     }
 }

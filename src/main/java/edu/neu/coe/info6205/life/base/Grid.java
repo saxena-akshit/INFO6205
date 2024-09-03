@@ -26,7 +26,6 @@ public class Grid implements Generational<Grid, Group>, Countable, Renderable {
                 '}';
     }
 
-    @Override
     public String render() {
         Group group = new Group(generation);
         for (Group g : groups) group = group.merge(g);
@@ -123,7 +122,6 @@ public class Grid implements Generational<Grid, Group>, Countable, Renderable {
         groups.forEach(action);
     }
 
-    @Override
     public Grid generation(BiConsumer<Long, Group> monitor) {
         forEach(g -> monitor.accept(generation, g));
         if (groups == null)

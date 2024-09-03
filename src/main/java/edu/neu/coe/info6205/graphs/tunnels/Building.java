@@ -11,12 +11,10 @@ import java.util.Objects;
  */
 public class Building implements GeoPoint {
 
-    @Override
     public String getName() {
         return code;
     }
 
-    @Override
     public Position getPosition() {
         return position;
     }

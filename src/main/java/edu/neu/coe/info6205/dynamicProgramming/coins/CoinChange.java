@@ -59,7 +59,6 @@ public class CoinChange {
         public Node(int coin, int required, Node parent) {
             this.coin = coin;
             this.required = required;
-            this.parent = parent;
             children = new ArrayList<>();
             if (coin > 0 && parent != null) nCoins = parent.nCoins + 1;
         }
@@ -83,7 +82,6 @@ public class CoinChange {
         }
 
         private final int required;
-        private final Node parent;
         private final int coin;
         private int nCoins = 0;
 
@@ -91,7 +89,7 @@ public class CoinChange {
             return children.add(node);
         }
 
-        private List<Node> children;
+        private final List<Node> children;
     }
 
     private final int[] coins;

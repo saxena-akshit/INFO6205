@@ -3,7 +3,6 @@ package edu.neu.coe.info6205.threesum;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;

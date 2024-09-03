@@ -3,8 +3,8 @@
  */
 package edu.neu.coe.info6205.sort.linearithmic;
 
-import edu.neu.coe.info6205.sort.BaseHelper;
 import edu.neu.coe.info6205.sort.Helper;
+import edu.neu.coe.info6205.sort.NonInstrumentingComparableHelper;
 import edu.neu.coe.info6205.util.Config;
 
 import java.util.Arrays;
@@ -44,7 +44,7 @@ public class IntroSort<X extends Comparable<X>> extends QuickSort_DualPivot<X> {
     }
 
     public IntroSort(Config config) {
-        this(new BaseHelper<>(DESCRIPTION, config));
+        this(new NonInstrumentingComparableHelper<>(DESCRIPTION, config));
     }
 
     public X[] sort(X[] xs, boolean makeCopy) {

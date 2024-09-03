@@ -84,7 +84,7 @@ public class HashTableSCTest {
         int capacity = 32;
         final HashTable_SC<String, String> hashTable = new HashTable_SC<>(capacity);
         for (int i = 0; i < capacity; i++)
-            hashTable.put("" + random.nextInt(100), "" + random.nextFloat());
+            hashTable.put(String.valueOf(random.nextInt(100)), String.valueOf(random.nextFloat()));
         assertEquals(29, hashTable.size());
         Set<String> keys = hashTable.keys();
         assertEquals(29, keys.size());
@@ -105,7 +105,7 @@ public class HashTableSCTest {
         long freeMemory2 = Runtime.getRuntime().freeMemory();
         System.out.println("used memory (empty hash table with m " + m + "): " + (freeMemory1 - freeMemory2));
         for (int i = 0; i < m * 2; i++)
-            ht1.put("" + random.nextInt(100000), "" + random.nextFloat());
+            ht1.put(String.valueOf(random.nextInt(100000)), String.valueOf(random.nextFloat()));
         assertEquals(15149, ht1.size()); // for m = 8k
 //        assertEquals(32768, ht1.size()); // for m = 16k
         long freeMemory3 = Runtime.getRuntime().freeMemory();

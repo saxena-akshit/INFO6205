@@ -239,7 +239,7 @@ public class BigNumber extends Number implements Comparable<BigNumber> {
         boolean subtract = !that.sign;
         for (int i = resultLength - 1; i >= 0; i--) {
             int sum = carry;
-            borrow = false;
+            borrow = false; // CONSIDER whether this is correct.
             if (i < thisLength) sum += decimals[i];
             if (i < thatLength) sum += subtract ? -that.decimals[i] : that.decimals[i];
             if (sum < 0) {

@@ -7,7 +7,7 @@ import java.util.List;
 public class BuildingLoader {
 
     public static List<Building> createBuildings() {
-        //can be replaced with the code to load the buildings into array list from excel file.
+        //can be replaced with the code to load the buildings into array list from Excel file.
         //Adding Academic buildings
         List<Building> buildings = new ArrayList<>();
         buildings.add(new Building(6, "CU", "Fenway", -71.091542, 42.341667, false, "Cushing Hall"));

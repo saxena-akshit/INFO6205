@@ -13,12 +13,12 @@ public class Timer {
     /**
      * Run the given function n times, once per "lap" and then return the result of calling meanLapTime().
      * The clock will be running when the method is invoked and when it is quit.
-     *
+     * <p>
      * This is the simplest form of repeat.
      *
      * @param n        the number of repetitions.
      * @param function a function which yields a T.
-     * @param <T> the type supplied by function (amy be Void).
+     * @param <T>      the type supplied by function (amy be Void).
      * @return the average milliseconds per repetition.
      */
     public <T> double repeat(int n, Supplier<T> function) {
@@ -38,8 +38,8 @@ public class Timer {
      * @param n        the number of repetitions.
      * @param supplier a function which supplies a different T value for each repetition.
      * @param function a function T=>U and which is to be timed.
-     * @param <T> the type which is supplied by supplier and passed in to function.
-     * @param <U> the type which is the result of <code>function</code> (may be Void).
+     * @param <T>      the type which is supplied by supplier and passed in to function.
+     * @param <U>      the type which is the result of <code>function</code> (may be Void).
      * @return the average milliseconds per repetition.
      */
     public <T, U> double repeat(int n, Supplier<T> supplier, Function<T, U> function) {
@@ -47,7 +47,7 @@ public class Timer {
     }
 
     /**
-     * Pause (without counting a lap); run the given functions n times while being timed, i.e. once per "lap", and finally return the result of calling meanLapTime().
+     * Pause (without counting a lap); run the given functions n times while being timed, i.e., once per "lap", and finally return the result of calling meanLapTime().
      *
      * @param n            the number of repetitions.
      * @param warmup       true if this is in the warmup phase.
@@ -55,8 +55,8 @@ public class Timer {
      * @param function     a function T=>U and which is to be timed.
      * @param preFunction  a function which pre-processes a T value and which precedes the call of function, but which is not timed (may be null). The result of the preFunction, if any, is also a T.
      * @param postFunction a function which consumes a U and which succeeds the call of function, but which is not timed (may be null).
-     * @param <T> the type which is supplied by supplier, processed by prefunction (if any), and passed in to function.
-     * @param <U> the type which is the result of function and the input to postFunction (if any).
+     * @param <T>          the type which is supplied by supplier, processed by prefunction (if any), and passed in to function.
+     * @param <U>          the type which is the result of function and the input to postFunction (if any).
      * @return the average milliseconds per repetition.
      */
     public <T, U> double repeat(int n, boolean warmup, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction, Consumer<U> postFunction) {

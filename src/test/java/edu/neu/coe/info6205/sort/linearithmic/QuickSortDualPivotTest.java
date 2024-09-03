@@ -15,6 +15,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
+import static edu.neu.coe.info6205.util.ConfigTest.INVERSIONS;
 import static edu.neu.coe.info6205.util.Utilities.round;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -29,7 +30,7 @@ public class QuickSortDualPivotTest {
         xs[1] = 4;
         xs[2] = 2;
         xs[3] = 1;
-        GenericSort<Integer> s = new QuickSort_DualPivot<>(xs.length, config);
+        Sort<Integer> s = new QuickSort_DualPivot<>(xs.length, config);
         Integer[] ys = s.sort(xs);
         assertEquals(Integer.valueOf(1), ys[0]);
         assertEquals(Integer.valueOf(2), ys[1]);
@@ -44,7 +45,7 @@ public class QuickSortDualPivotTest {
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(10));
         final Integer[] sorted = sorter.sort(xs);
-        assertTrue(helper.sorted(sorted));
+        assertTrue(helper.isSorted(sorted));
     }
 
     @Test
@@ -54,7 +55,7 @@ public class QuickSortDualPivotTest {
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(97));
         final Integer[] sorted = sorter.sort(xs);
-        assertTrue(helper.sorted(sorted));
+        assertTrue(helper.isSorted(sorted));
     }
 
     @Test
@@ -64,7 +65,7 @@ public class QuickSortDualPivotTest {
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(100));
         final Integer[] sorted = sorter.sort(xs);
-        assertTrue(helper.sorted(sorted));
+        assertTrue(helper.isSorted(sorted));
     }
 
     @Test
@@ -74,7 +75,7 @@ public class QuickSortDualPivotTest {
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(1000));
         final Integer[] sorted = sorter.sort(xs);
-        assertTrue(helper.sorted(sorted));
+        assertTrue(helper.isSorted(sorted));
     }
 
     @Test
@@ -84,7 +85,7 @@ public class QuickSortDualPivotTest {
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(10000));
         final Integer[] sorted = sorter.sort(xs);
-        assertTrue(helper.sorted(sorted));
+        assertTrue(helper.isSorted(sorted));
     }
 
     @Test
@@ -94,7 +95,7 @@ public class QuickSortDualPivotTest {
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(10000));
         final Integer[] sorted = sorter.sort(xs);
-        assertTrue(helper.sorted(sorted));
+        assertTrue(helper.isSorted(sorted));
     }
 
     @Test
@@ -102,20 +103,20 @@ public class QuickSortDualPivotTest {
         Integer[] xs = new Integer[2];
         xs[0] = 3;
         xs[1] = 4;
-        final Config config = Config.setupConfig("true", "0", "1", "1", "");
-        final BaseHelper<Integer> helper = new InstrumentedHelper<>("test", config);
+        final Config config = Config.setupConfig("true", "false", "0", "1", "1", "");
+        final NonComparableHelper<Integer> helper = new InstrumentedComparableHelper<>("test", config);
         QuickSort<Integer> sorter = new QuickSort_DualPivot<>(helper);
         Integer[] ys = sorter.sort(xs);
-        assertTrue(helper.sorted(ys));
+        assertTrue(helper.isSorted(ys));
         helper.postProcess(ys);
         assertEquals(Integer.valueOf(3), ys[0]);
         assertEquals(Integer.valueOf(4), ys[1]);
         final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
         final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
-        assertEquals(1, (int) statPack.getStatistics(InstrumentedHelper.COMPARES).mean());
-        assertEquals(2, (int) statPack.getStatistics(InstrumentedHelper.SWAPS).mean()); // XXX check this
-        assertEquals(0, (int) statPack.getStatistics(InstrumentedHelper.FIXES).mean());
-        assertEquals(12, (int) statPack.getStatistics(InstrumentedHelper.HITS).mean()); // XXX Is this correct? Why not just 2?
+        assertEquals(1, (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean());
+        assertEquals(0, (int) statPack.getStatistics(InstrumentedComparableHelper.SWAPS).mean()); // XXX check this
+        assertEquals(0, (int) statPack.getStatistics(InstrumentedComparableHelper.FIXES).mean());
+        assertEquals(2, (int) statPack.getStatistics(InstrumentedComparableHelper.HITS).mean()); // XXX Is this correct? Why not just 2?
     }
 
     @Test
@@ -123,20 +124,20 @@ public class QuickSortDualPivotTest {
         Integer[] xs = new Integer[2];
         xs[0] = 4;
         xs[1] = 3;
-        final Config config = Config.setupConfig("true", "0", "1", "1", "");
-        final BaseHelper<Integer> helper = new InstrumentedHelper<>("test", config);
+        final Config config = Config.setupConfig("true", "true", "0", "1", "1", "");
+        final NonComparableHelper<Integer> helper = new InstrumentedComparableHelper<>("test", config);
         QuickSort<Integer> sorter = new QuickSort_DualPivot<>(helper);
         Integer[] ys = sorter.sort(xs);
-        assertTrue(helper.sorted(ys));
+        assertTrue(helper.isSorted(ys));
         helper.postProcess(ys);
         assertEquals(Integer.valueOf(3), ys[0]);
         assertEquals(Integer.valueOf(4), ys[1]);
         final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
         final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
-        assertEquals(1, (int) statPack.getStatistics(InstrumentedHelper.COMPARES).mean());
-        assertEquals(3, (int) statPack.getStatistics(InstrumentedHelper.SWAPS).mean()); // XXX check this
-        assertEquals(1, (int) statPack.getStatistics(InstrumentedHelper.FIXES).mean());
-        assertEquals(14, (int) statPack.getStatistics(InstrumentedHelper.HITS).mean()); // XXX Is this correct? Why not just 4?
+        assertEquals(1, (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean());
+        assertEquals(1, (int) statPack.getStatistics(InstrumentedComparableHelper.SWAPS).mean()); // XXX check this
+        assertEquals(1, (int) statPack.getStatistics(InstrumentedComparableHelper.FIXES).mean());
+        assertEquals(2, (int) statPack.getStatistics(InstrumentedComparableHelper.HITS).mean()); // XXX Is this correct? Why not just 4?
     }
 
     @Test
@@ -145,21 +146,21 @@ public class QuickSortDualPivotTest {
         xs[0] = 4;
         xs[1] = 3;
         xs[2] = 5;
-        final Config config = Config.setupConfig("true", "0", "1", "1", "");
-        final BaseHelper<Integer> helper = new InstrumentedHelper<>("test", config);
+        final Config config = Config.setupConfig("true", "true", "0", "1", "1", "");
+        final NonComparableHelper<Integer> helper = new InstrumentedComparableHelper<>("test", config);
         QuickSort<Integer> sorter = new QuickSort_DualPivot<>(helper);
         Integer[] ys = sorter.sort(xs);
-        assertTrue(helper.sorted(ys));
+        assertTrue(helper.isSorted(ys));
         helper.postProcess(ys);
         assertEquals(Integer.valueOf(3), ys[0]);
         assertEquals(Integer.valueOf(4), ys[1]);
         assertEquals(Integer.valueOf(5), ys[2]);
         final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
         final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
-        assertEquals(2, (int) statPack.getStatistics(InstrumentedHelper.COMPARES).mean());
-        assertEquals(5, (int) statPack.getStatistics(InstrumentedHelper.SWAPS).mean()); // XXX How can this be right?
-        assertEquals(1, (int) statPack.getStatistics(InstrumentedHelper.FIXES).mean());
-        assertEquals(27, (int) statPack.getStatistics(InstrumentedHelper.HITS).mean()); // XXX Is this correct?
+        assertEquals(2, (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean());
+        assertEquals(1, (int) statPack.getStatistics(InstrumentedComparableHelper.SWAPS).mean());
+        assertEquals(1, (int) statPack.getStatistics(InstrumentedComparableHelper.FIXES).mean());
+        assertEquals(3, (int) statPack.getStatistics(InstrumentedComparableHelper.HITS).mean());
     }
 
     @Test
@@ -170,11 +171,11 @@ public class QuickSortDualPivotTest {
         xs[1] = 4;
         xs[2] = 2;
         xs[3] = 1;
-        final Config config = Config.setupConfig("true", "0", "1", "1", "");
-        final BaseHelper<Integer> helper = new InstrumentedHelper<>("test", config);
+        final Config config = Config.setupConfig("true", "true", "0", "1", "1", "");
+        final NonComparableHelper<Integer> helper = new InstrumentedComparableHelper<>("test", config);
         QuickSort<Integer> sorter = new QuickSort_DualPivot<>(helper);
         Integer[] ys = sorter.sort(xs);
-        assertTrue(helper.sorted(ys));
+        assertTrue(helper.isSorted(ys));
         helper.postProcess(ys);
         assertEquals(Integer.valueOf(1), ys[0]);
         assertEquals(Integer.valueOf(2), ys[1]);
@@ -182,10 +183,10 @@ public class QuickSortDualPivotTest {
         assertEquals(Integer.valueOf(4), ys[3]);
         final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
         final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
-        assertEquals(5, (int) statPack.getStatistics(InstrumentedHelper.COMPARES).mean());
-        assertEquals(8, (int) statPack.getStatistics(InstrumentedHelper.SWAPS).mean()); // XXX how can this be right?
-        assertEquals(3, (int) statPack.getStatistics(InstrumentedHelper.FIXES).mean());
-        assertEquals(42, (int) statPack.getStatistics(InstrumentedHelper.HITS).mean()); // XXX how can this be right?
+        assertEquals(5, (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean());
+        assertEquals(3, (int) statPack.getStatistics(InstrumentedComparableHelper.SWAPS).mean());
+        assertEquals(3, (int) statPack.getStatistics(InstrumentedComparableHelper.FIXES).mean());
+        assertEquals(10, (int) statPack.getStatistics(InstrumentedComparableHelper.HITS).mean());
     }
 
     @Test
@@ -194,7 +195,7 @@ public class QuickSortDualPivotTest {
         char[] charArray = testString.toCharArray();
         Character[] array = new Character[charArray.length];
         for (int i = 0; i < array.length; i++) array[i] = charArray[i];
-        final Config config = Config.setupConfig("true", "0", "1", "", "");
+        final Config config = Config.setupConfig("true", "false", "0", "1", "", "");
         QuickSort<Character> sorter = new QuickSort_DualPivot<Character>(array.length, config);
         Partitioner<Character> partitioner = sorter.partitioner;
         List<Partition<Character>> partitions = partitioner.partition(QuickSort.createPartition(array));
@@ -220,7 +221,7 @@ public class QuickSortDualPivotTest {
         char[] charArray = testString.toCharArray();
         Character[] array = new Character[charArray.length];
         for (int i = 0; i < array.length; i++) array[i] = charArray[i];
-        final Config config = Config.setupConfig("true", "0", "1", "", "");
+        final Config config = Config.setupConfig("true", "false", "0", "1", "", "");
         QuickSort<Character> sorter = new QuickSort_DualPivot<Character>(array.length, config);
         Partitioner<Character> partitioner = sorter.partitioner;
         List<Partition<Character>> partitions = partitioner.partition(QuickSort.createPartition(array));
@@ -246,8 +247,8 @@ public class QuickSortDualPivotTest {
         int N = (int) Math.pow(2, k);
         // NOTE this depends on the cutoff value for quick sort.
         int levels = k - 2;
-        final Config config = Config.setupConfig("true", "0", "1", "", "");
-        final BaseHelper<Integer> helper = (BaseHelper<Integer>) HelperFactory.create("quick sort dual pivot", N, config);
+        final Config config = Config.setupConfig("true", "true", "0", "1", "", "");
+        final NonComparableHelper<Integer> helper = HelperFactory.create("quick sort dual pivot", N, config);
         System.out.println(helper);
         Sort<Integer> s = new QuickSort_DualPivot<>(helper);
         s.init(N);
@@ -255,17 +256,17 @@ public class QuickSortDualPivotTest {
         assertEquals(Integer.valueOf(1360), xs[0]);
         helper.preProcess(xs);
         Integer[] ys = s.sort(xs);
-        assertTrue(helper.sorted(ys));
+        assertTrue(helper.isSorted(ys));
         helper.postProcess(ys);
         final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
         final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
         System.out.println(statPack);
-        final int compares = (int) statPack.getStatistics(InstrumentedHelper.COMPARES).mean();
-        final int inversions = (int) statPack.getStatistics(InstrumentedHelper.INVERSIONS).mean();
-        final int fixes = (int) statPack.getStatistics(InstrumentedHelper.FIXES).mean();
-        final int swaps = (int) statPack.getStatistics(InstrumentedHelper.SWAPS).mean();
-        final int copies = (int) statPack.getStatistics(InstrumentedHelper.COPIES).mean();
-        final int worstCompares = round(2.0 * N * Math.log(N));
+        final int compares = (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean();
+        final int inversions = (int) statPack.getStatistics(INVERSIONS).mean();
+        final int fixes = (int) statPack.getStatistics(InstrumentedComparableHelper.FIXES).mean();
+        final int swaps = (int) statPack.getStatistics(InstrumentedComparableHelper.SWAPS).mean();
+        final int copies = (int) statPack.getStatistics(InstrumentedComparableHelper.COPIES).mean();
+        final long worstCompares = round(2.0 * N * Math.log(N));
         System.out.println("compares: " + compares + ", worstCompares: " + worstCompares);
         assertTrue(compares <= worstCompares);
         assertTrue(inversions <= fixes);
@@ -275,28 +276,28 @@ public class QuickSortDualPivotTest {
     public void testPartitionWithSort() {
         String[] xs = new String[]{"g", "f", "e", "d", "c", "b", "a"};
         int n = xs.length;
-        final Config config = Config.setupConfig("true", "0", "1", "", "");
-        final BaseHelper<String> helper = new InstrumentedHelper<>("test", config);
+        final Config config = Config.setupConfig("true", "true", "0", "1", "", "");
+        final NonComparableHelper<String> helper = new InstrumentedComparableHelper<>("test", config);
         final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
         QuickSort<String> sorter = new QuickSort_DualPivot<>(helper);
         int inversions = n * (n - 1) / 2;
         assertEquals(inversions, helper.inversions(xs));
         Partitioner<String> partitioner = sorter.createPartitioner();
         List<Partition<String>> partitions = partitioner.partition(new Partition<>(xs, 0, xs.length));
-        assertEquals(11, privateMethodTester.invokePrivate("getFixes"));
+        assertEquals(11L, privateMethodTester.invokePrivate("getFixes"));
         Partition<String> p0 = partitions.get(0);
         sorter.sort(xs, 0, p0.to, 0);
-        assertEquals(11, privateMethodTester.invokePrivate("getFixes"));
+        assertEquals(11L, privateMethodTester.invokePrivate("getFixes"));
         Partition<String> p1 = partitions.get(1);
         sorter.sort(xs, p1.from, p1.to, 0);
-        assertEquals(21, privateMethodTester.invokePrivate("getFixes"));
+        assertEquals(21L, privateMethodTester.invokePrivate("getFixes"));
         Partition<String> p2 = partitions.get(2);
         sorter.sort(xs, p2.from, n, 0);
-        int fixes = (int) privateMethodTester.invokePrivate("getFixes");
+        long fixes = (long) privateMethodTester.invokePrivate("getFixes");
         // NOTE: there are at least as many fixes as inversions -- sort methods aren't necessarily perfectly efficient in terms of swaps.
         assertTrue(inversions <= fixes);
         assertEquals(0, helper.inversions(xs));
-        assertEquals(13, privateMethodTester.invokePrivate("getSwaps"));
+        assertEquals(11L, privateMethodTester.invokePrivate("getSwaps"));
     }
 
     private static String[] setupWords(final int n) {

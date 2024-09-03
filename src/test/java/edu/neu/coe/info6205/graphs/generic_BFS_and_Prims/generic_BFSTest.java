@@ -1,6 +1,5 @@
 package edu.neu.coe.info6205.graphs.generic_BFS_and_Prims;
 
-import edu.neu.coe.info6205.graphs.BFS_and_prims.BFS;
 import edu.neu.coe.info6205.graphs.generic_BFS_and_prims.GBFS;
 import edu.neu.coe.info6205.graphs.generic_BFS_and_prims.Graph;
 import org.junit.Assert;
@@ -8,7 +7,6 @@ import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 public class generic_BFSTest {
 
@@ -30,7 +28,7 @@ public class generic_BFSTest {
         g.addEdge("c", "d");
         g.addEdge("d", "d");
 
-        GBFS b = new GBFS(g,"c");
+        GBFS b = new GBFS(g, "c");
 
         LinkedList<String> expected = new LinkedList<String>();
         expected.add("c");
@@ -38,8 +36,9 @@ public class generic_BFSTest {
         expected.add("b");
         expected.add("d");
 
-        Assert.assertEquals(expected,b.bfs(g,"c"));
+        Assert.assertEquals(expected, b.bfs(g, "c"));
     }
+
     @Test
     public void testbfs2() {
         Graph g = new Graph<String>(4);
@@ -55,7 +54,7 @@ public class generic_BFSTest {
         g.addEdge(2, 3);
         g.addEdge(3, 3);
 
-        GBFS b = new GBFS(g,2);
+        GBFS b = new GBFS(g, 2);
 
         LinkedList<Integer> expected = new LinkedList<Integer>();
         expected.add(2);
@@ -63,8 +62,9 @@ public class generic_BFSTest {
         expected.add(1);
         expected.add(3);
 
-        Assert.assertEquals(expected,b.bfs(g,2));
+        Assert.assertEquals(expected, b.bfs(g, 2));
     }
+
     @Test
     public void testbfs3() {
         Graph g = new Graph<String>(6);
@@ -104,13 +104,13 @@ public class generic_BFSTest {
     public void testbfs4() {
         Graph g = new Graph<String>(7);
 
-            g.addVertex(0);
-            g.addVertex(1);
-            g.addVertex(2);
-            g.addVertex(3);
-            g.addVertex(4);
-            g.addVertex(5);
-            g.addVertex(6);
+        g.addVertex(0);
+        g.addVertex(1);
+        g.addVertex(2);
+        g.addVertex(3);
+        g.addVertex(4);
+        g.addVertex(5);
+        g.addVertex(6);
 
         g.addEdge(0, 1);
         g.addEdge(0, 3);
@@ -137,7 +137,7 @@ public class generic_BFSTest {
 
         final List bfs = b.bfs(g, 0);
 
-        Assert.assertEquals(expected1,bfs);
+        Assert.assertEquals(expected1, bfs);
     }
 
     @Test
@@ -170,6 +170,6 @@ public class generic_BFSTest {
         expected.add(5);
 
         final List bfs = b.bfs(g, 0);
-        Assert.assertEquals(expected,bfs);
+        Assert.assertEquals(expected, bfs);
     }
 }

@@ -27,7 +27,6 @@ public class CouplingNone {
     }
 
     public static void main(String[] args) {
-        CouplingNone c = new CouplingNone();
         A a = new A(0);
         int x = a.getA();
         B b = new B(1);

@@ -168,7 +168,7 @@ public class BSTSimple<Key extends Comparable<Key>, Value> implements BstDetail<
      * @return the total number of levels in this BST.
      */
     public int depth() {
-        return root!=null ? root.depth() : 0;
+        return root != null ? root.depth() : 0;
     }
 
     private class NodeValue {
@@ -238,18 +238,18 @@ public class BSTSimple<Key extends Comparable<Key>, Value> implements BstDetail<
 
     private void show(Node node, StringBuffer sb, int indent) {
         if (node == null) return;
-        for (int i = 0; i < indent; i++) sb.append("  ");
+        sb.append("  ".repeat(Math.max(0, indent)));
         sb.append(node.key);
         sb.append(": ");
         sb.append(node.value);
         sb.append("\n");
         if (node.smaller != null) {
-            for (int i = 0; i <= indent; i++) sb.append("  ");
+            sb.append("  ".repeat(Math.max(0, indent + 1)));
             sb.append("smaller: ");
             show(node.smaller, sb, indent + 1);
         }
         if (node.larger != null) {
-            for (int i = 0; i <= indent; i++) sb.append("  ");
+            sb.append("  ".repeat(Math.max(0, indent + 1)));
             sb.append("larger: ");
             show(node.larger, sb, indent + 1);
         }

@@ -62,14 +62,14 @@ public class PQBenchmark {
     }
 
     /**
-     * For mergesort, the number of array accesses is actually 6 times the number of comparisons.
+     * For mergesort, the number of array accesses is actually six times the number of comparisons.
      * That's because, in addition to each comparison, there will be approximately two copy operations.
      * Thus, in the case where comparisons are based on primitives,
      * the normalized time per run should approximate the time for one array access.
      */
     public final static TimeLogger[] timeLoggersLinearithmic = {
-            new TimeLogger("Raw time per run (mSec): ", (time, n) -> time),
-            new TimeLogger("Normalized time per run (n log n): ", (time, n) -> time / minComparisons(n) / 6 * 1e6)
+            new TimeLogger("Raw time per run (mSec): ", null),
+            new TimeLogger("Normalized time per run (n log n): ", SortBenchmark::minComparisons)
     };
 
     final static LazyLogger logger = new LazyLogger(PQBenchmark.class);
@@ -77,19 +77,8 @@ public class PQBenchmark {
     final static Pattern regexLeipzig = Pattern.compile("[~\\t]*\\t(([\\s\\p{Punct}\\uFF0C]*\\p{L}+)*)");
 
     /**
-     * This is based on log2(n!)
-     *
-     * @param n the number of elements.
-     * @return the minimum number of comparisons possible to sort n randomly ordered elements.
-     */
-    static double minComparisons(int n) {
-        double lgN = Utilities.lg(n);
-        return n * (lgN - LgE) + lgN / 2 + 1.33;
-    }
-
-    /**
      * This is the mean number of inversions in a randomly ordered set of n elements.
-     * For insertion sort, each (low-level) swap fixes one inversion, so on average there are this number of swaps.
+     * For insertion sort, each (low-level) swap fixes one inversion, so on average, this number of swaps is required.
      * The minimum number of comparisons is slightly higher.
      *
      * @param n the number of elements

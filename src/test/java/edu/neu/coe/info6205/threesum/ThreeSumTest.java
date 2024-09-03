@@ -97,6 +97,14 @@ public class ThreeSumTest {
     }
 
     @Test
+    public void testGetTriplesE() {
+        int[] ints = new int[]{-38, -23, -15, -12, -6, 17, 18, 37, 42, 43};
+        ThreeSumQuadratic target = new ThreeSumQuadratic(ints);
+        Triple[] triples = target.getTriples();
+        assertEquals(1, triples.length);
+    }
+
+    @Test
     public void testGetTriplesC0() {
         int[] ints = new int[]{30, -40, -20, -10, 40, 0, 10, 5};
         Arrays.sort(ints);
@@ -107,7 +115,7 @@ public class ThreeSumTest {
         assertEquals(4, triples.length);
         assertEquals(4, new ThreeSumCubic(ints).getTriples().length);
     }
-
+//
     @Test
     public void testGetTriplesC1() {
         Supplier<int[]> intsSupplier = new Source(20, 20, 1L).intsSupplier(10);

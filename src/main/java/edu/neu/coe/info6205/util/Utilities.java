@@ -21,7 +21,7 @@ public class Utilities {
     }
 
     /**
-     * Create a string representing an double, with three decimal places.
+     * Create a string representing a double, with three decimal places.
      *
      * @param x the number to show.
      * @return a String representing the number rounded to three decimal places.
@@ -35,19 +35,19 @@ public class Utilities {
      * Create a string representing an integer, with commas to separate thousands.
      *
      * @param x the integer.
-     * @return a String representing the number with commas.
+     * @return a String representing the number without commas.
      */
-    public static String formatWhole(int x) {
-        return String.format("%,d", x);
+    public static String formatWhole(long x) {
+        return String.format("%d", x);
     }
 
     public static String asInt(double x) {
-        final int i = round(x);
+        final long i = round(x);
         return formatWhole(i);
     }
 
-    public static int round(double x) {
-        return (int) (Math.round(x));
+    public static long round(double x) {
+        return Math.round(x);
     }
 
     public static <T> T[] fillRandomArray(Class<T> clazz, Random random, int n, Function<Random, T> f) {
@@ -64,5 +64,27 @@ public class Utilities {
      */
     public static double lg(double n) {
         return Math.log(n) / Math.log(2);
+    }
+
+    /**
+     * Create a string representing an integer, with commas to separate thousands.
+     *
+     * @param x the integer.
+     * @return a String representing the number with commas.
+     */
+    public static String formatWhole(final int x) {
+        return String.format("%,d", x);
+    }
+
+    public static void findUnicode(String[] xs) {
+        for (String s : xs) if (s.charAt(0) > 255) System.out.println("**** Unicode: " + s);
+    }
+
+    public static void findUnicode(String[] xs, int from, int to) {
+//        for (int i=from; i < to; i++) {
+//            byte[] bytes = xs[i].getBytes();
+//            for (int j=0; j< bytes.length; j++) if ((bytes[j] & 0x80) != 0)
+//                System.out.println("**** Unicode: "+xs[i]);
+//        }
     }
 }

@@ -1,7 +1,7 @@
 package edu.neu.coe.info6205.util;
 
 /**
- * This algorithm is explained here: https://en.wikipedia.org/wiki/Fast_inverse_square_root
+ * This algorithm is explained here: <a href="https://en.wikipedia.org/wiki/Fast_inverse_square_root">...</a>
  */
 public class FastInverseSquareRoot {
 
@@ -11,7 +11,7 @@ public class FastInverseSquareRoot {
         int number = Float.floatToIntBits(x);
         number = MAGIC_NUMBER - (number >> 1);
         float result = Float.intBitsToFloat(number);
-        while (optimize-->0) result *= (1.5f - (x2 * result * result));
+        while (optimize-- > 0) result *= (1.5f - (x2 * result * result));
         return result;
     }
 

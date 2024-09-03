@@ -1,86 +1,38 @@
 package edu.neu.coe.info6205.sort;
 
 import edu.neu.coe.info6205.util.Config;
+import edu.neu.coe.info6205.util.StatPack;
 import edu.neu.coe.info6205.util.Utilities;
 
 import java.util.Random;
 import java.util.function.Function;
 
-public class BaseHelper<X extends Comparable<X>> implements Helper<X> {
+import static edu.neu.coe.info6205.util.Config.*;
+
+public abstract class BaseHelper<X> {
+    abstract public boolean instrumented();
 
     /**
-     * Static method to get a Helper configured for the given class.
-     *
-     * @param clazz the class for configuration.
-     * @param <Y>   the type.
-     * @return a Helper&lt;Y&gt;
+     * CONSIDER Change this to protected.
      */
-    public static <Y extends Comparable<Y>> Helper<Y> getHelper(final Class<?> clazz) {
-        try {
-            return new BaseHelper<>("Standard Helper", Config.load(clazz));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    public final Instrument instrumenter;
+    protected final String description;
+    protected final Random random;
+    protected final Config config;
+    protected final int cutoff;
     /**
-     * @return false
+     * Keep track of the random array that was generated. This is available via the InstrumentedHelper class.
      */
-    public boolean instrumented() {
-        return false;
-    }
+    protected X[] randomArray;
+    protected int n;
 
-    /**
-     * Swap the elements of array 'a' at indices i and j.
-     *
-     * @param xs the array.
-     * @param i  one of the indices.
-     * @param j  the other index.
-     */
-    public void swap(X[] xs, int i, int j) {
-        X temp = xs[i];
-        xs[i] = xs[j];
-        xs[j] = temp;
-    }
-
-    /**
-     * Method to perform a stable swap using half-exchanges,
-     * i.e. between xs[i] and xs[j] such that xs[j] is moved to index i,
-     * and xs[i] through xs[j-1] are all moved up one.
-     * This type of swap is used by insertion sort.
-     *
-     * @param xs the array of Xs.
-     * @param i  the index of the destination of xs[j].
-     * @param j  the index of the right-most element to be involved in the swap.
-     */
-    public void swapInto(X[] xs, int i, int j) {
-        if (j > i) {
-            X x = xs[j];
-            copyBlock(xs, i, xs, i + 1, j - i);
-            xs[i] = x;
-        }
-    }
-
-    public boolean sorted(X[] xs) {
-        for (int i = 1; i < xs.length; i++) if (xs[i - 1].compareTo(xs[i]) > 0) return false;
-        return true;
-    }
-
-    public X[] random(int m, Class<X> clazz, Function<Random, X> f) {
-        if (m <= 0)
-            throw new HelperException("Helper.random: requesting zero random elements (helper not initialized?)");
-        randomArray = null;
-        randomArray = Utilities.fillRandomArray(clazz, random, m, f);
-        return randomArray;
-    }
-
-    /**
-     * Method to post-process the array xs after sorting.
-     * By default, this method does nothing.
-     *
-     * @param xs the array to be tested.
-     */
-    public void postProcess(X[] xs) {
+    public BaseHelper(String description, Random random, Instrument instrumenter, Config config, int n) {
+        this.description = description;
+        this.random = random;
+        this.instrumenter = instrumenter;
+        this.config = config;
+        this.n = n;
+        this.cutoff = config.getInt(HELPER, CUTOFF, CUTOFF_DEFAULT);
     }
 
     @Override
@@ -110,82 +62,98 @@ public class BaseHelper<X extends Comparable<X>> implements Helper<X> {
         return n;
     }
 
+    /**
+     * Get the configured cutoff value.
+     *
+     * @return a value for cutoff.
+     */
+    public int cutoff() {
+        // NOTE that a cutoff value of 0 or less will result in an infinite recursion for any recursive method that uses it.
+        return (cutoff >= 1) ? cutoff : CUTOFF_DEFAULT;
+    }
+
     public void close() {
     }
 
-    /**
-     * Constructor for explicit random number generator.
-     *
-     * @param description the description of this Helper (for humans).
-     * @param n           the number of elements expected to be sorted. The field n is mutable so can be set after the constructor.
-     * @param random      a random number generator.
-     */
-    public BaseHelper(String description, int n, Random random, Config config) {
-        this.n = n;
-        this.description = description;
-        this.random = random;
-        this.config = config;
+    public X[] random(int m, Class<X> clazz, Function<Random, X> f) {
+        if (m <= 0)
+            throw new HelperException("Helper.random: requesting zero random elements (helper not initialized?)");
+        randomArray = Utilities.fillRandomArray(clazz, random, m, f);
+        return randomArray;
+    }
+
+    public void init(int n, int nRuns) {
+        instrumenter.init(n, nRuns);
+    }
+
+    public StatPack getStatPack() {
+        return instrumenter.getStatPack();
+    }
+
+    public long getCompares() {
+        return instrumenter.getCompares();
+    }
+
+    public long getSwaps() {
+        return instrumenter.getSwaps();
+    }
+
+    public long getFixes() {
+        return instrumenter.getFixes();
+    }
+
+    public void incrementCopies(int n) {
+        instrumenter.incrementCopies(n);
+    }
+
+    public void incrementHits(long n) {
+        instrumenter.incrementHits(n);
+    }
+
+    public void incrementLookups() {
+        instrumenter.incrementLookups();
     }
 
     /**
-     * Constructor for explicit seed.
+     * If instrumenting, increment the number of fixes by n.
      *
-     * @param description the description of this Helper (for humans).
-     * @param n           the number of elements expected to be sorted. The field n is mutable so can be set after the constructor.
-     * @param seed        the seed for the random number generator.
+     * @param n the number of copies made.
      */
-    public BaseHelper(String description, int n, long seed, Config config) {
-        this(description, n, new Random(seed), config);
+    public void incrementFixes(int n) {
+        instrumenter.incrementFixes(n);
     }
 
-    /**
-     * Constructor to create a Helper with a random seed.
-     *
-     * @param description the description of this Helper (for humans).
-     * @param n           the number of elements expected to be sorted. The field n is mutable so can be set after the constructor.
-     */
-    public BaseHelper(String description, int n, Config config) {
-        this(description, n, System.currentTimeMillis(), config);
+    public void incrementCompares() {
+        instrumenter.incrementCompares();
     }
 
-    /**
-     * Constructor to create a Helper with a random seed and an n value of 0.
-     *
-     * @param description the description of this Helper (for humans).
-     */
-    public BaseHelper(String description, Config config) {
-        this(description, 0, config);
+    public void incrementSwaps(int n) {
+        instrumenter.incrementSwaps(n);
+    }
+
+    public long getHits() {
+        return instrumenter.getHits();
+    }
+
+    public long getLookups() {
+        return instrumenter.getLookups();
+    }
+
+    public long getCopies() {
+        return instrumenter.getCopies();
+    }
+
+    public boolean countFixes() {
+        return instrumenter.countFixes();
+    }
+
+    public void gatherStatistic() {
+        instrumenter.gatherStatistic();
+    }
+
+    public boolean isShowStats() {
+        return instrumenter.isShowStats();
     }
 
     public static final String INSTRUMENT = "instrument";
-
-    /**
-     * Keep track of the random array that was generated. This is available via the InstrumentedHelper class.
-     */
-    protected X[] randomArray;
-
-    public static class HelperException extends RuntimeException {
-
-        public HelperException(String message) {
-            super(message);
-        }
-
-        public HelperException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public HelperException(Throwable cause) {
-            super(cause);
-        }
-
-        public HelperException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-            super(message, cause, enableSuppression, writableStackTrace);
-        }
-    }
-
-    protected final String description;
-    protected final Random random;
-
-    protected final Config config;
-    protected int n;
 }

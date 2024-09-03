@@ -4,7 +4,7 @@ import java.util.function.DoubleFunction;
 
 /**
  * This class models the Newton-Raphson Approximation algorithm.
- * See https://en.wikipedia.org/wiki/Newton%27s_method
+ * See <a href="https://en.wikipedia.org/wiki/Newton%27s_method">...</a>
  * It is an example of a non-deterministic algorithm inasmuch as the convergence (or lack thereof) is very dependent
  * on the value of the initial guess x0 to the solve method.
  * However, if you run it with identical starting conditions, it will always come out the same: it does not use any random elements.

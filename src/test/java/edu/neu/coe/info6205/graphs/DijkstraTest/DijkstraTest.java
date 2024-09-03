@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 
 public class DijkstraTest {
     @Test
-    public void test1(){
+    public void test1() {
 
         EdgeWeightedDigraph ewd = new EdgeWeightedDigraph(9);
         DirectedEdge e = new DirectedEdge(0, 1, 4);
@@ -63,7 +63,7 @@ public class DijkstraTest {
     }
 
     @Test
-    public void test2(){
+    public void test2() {
 
         EdgeWeightedDigraph ewd = new EdgeWeightedDigraph(8);
         DirectedEdge e = new DirectedEdge(0, 4, 0.38);
@@ -116,7 +116,7 @@ public class DijkstraTest {
     }
 
     @Test
-    public void test3(){
+    public void test3() {
 
         EdgeWeightedDigraph ewd = new EdgeWeightedDigraph(7);
         DirectedEdge e = new DirectedEdge(0, 1, 3);
@@ -159,7 +159,7 @@ public class DijkstraTest {
     }
 
     @Test
-    public void test4(){
+    public void test4() {
 
         EdgeWeightedDigraph ewd = new EdgeWeightedDigraph(7);
         DirectedEdge e = new DirectedEdge(0, 1, 2);
@@ -200,7 +200,7 @@ public class DijkstraTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void test5(){
+    public void test5() {
 
         EdgeWeightedDigraph ewd = new EdgeWeightedDigraph(4);
         DirectedEdge e = new DirectedEdge(0, 1, 2);

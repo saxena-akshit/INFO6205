@@ -11,7 +11,7 @@ public class QuickSort_Exp<X extends Comparable<X>> extends QuickSort<X> {
     public static final String DESCRIPTION = "QuickSort basic";
 
     public QuickSort_Exp(String description, int N, Config config) {
-        super(description, N, config);
+        super(description, N, 1, config);
         setPartitioner(createPartitioner());
     }
 
@@ -58,7 +58,7 @@ public class QuickSort_Exp<X extends Comparable<X>> extends QuickSort<X> {
          * Method to partition the given partition into smaller partitions.
          *
          * @param partition the partition to divide up.
-         * @return an array of partitions, whose length depends on the sorting method being used.
+         * @return a list of partitions, whose length depends on the sorting method being used.
          */
         public List<Partition<X>> partition(Partition<X> partition) {
             final X[] xs = partition.xs;

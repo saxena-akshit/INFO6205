@@ -1,14 +1,15 @@
 package edu.neu.coe.info6205.sort.linearithmic;
 
-import edu.neu.coe.info6205.sort.Helper;
-import edu.neu.coe.info6205.sort.InstrumentedHelper;
-import edu.neu.coe.info6205.sort.SortWithHelper;
+import edu.neu.coe.info6205.sort.*;
 import edu.neu.coe.info6205.sort.elementary.InsertionSort;
 import edu.neu.coe.info6205.util.Config;
 
 import java.util.Arrays;
 
-public class MergeSortBasic<X extends Comparable<X>> extends SortWithHelper<X> {
+import static edu.neu.coe.info6205.sort.linearithmic.MergeSort.INSURANCE;
+import static edu.neu.coe.info6205.sort.linearithmic.MergeSort.MERGESORT;
+
+public class MergeSortBasic<X extends Comparable<X>> extends SortWithComparableHelper<X> implements HasAdditionalMemory {
 
     public static final String DESCRIPTION = "MergeSort";
 
@@ -21,6 +22,7 @@ public class MergeSortBasic<X extends Comparable<X>> extends SortWithHelper<X> {
      */
     public MergeSortBasic(Helper<X> helper) {
         super(helper);
+        // TODO use impersonat (like in MergeSort)
         insertionSort = new InsertionSort<>(helper);
     }
 
@@ -31,22 +33,25 @@ public class MergeSortBasic<X extends Comparable<X>> extends SortWithHelper<X> {
      * @param config the configuration.
      */
     public MergeSortBasic(int N, Config config) {
-        super(DESCRIPTION + ":" + getConfigString(config), N, config);
+        super(DESCRIPTION + ":" + getConfigString(config), N, 1, config);
+        // TODO use impersonat (like in MergeSort)
         insertionSort = new InsertionSort<>(getHelper());
     }
 
     private static String getConfigString(Config config) {
         StringBuilder stringBuilder = new StringBuilder();
-        if (config.getBoolean("mergesort", "insurance")) stringBuilder.append(" with insurance comparison");
+        if (config.getBoolean(MERGESORT, INSURANCE)) stringBuilder.append(" with insurance comparison");
         return stringBuilder.toString();
     }
 
     public X[] sort(X[] xs, boolean makeCopy) {
         getHelper().init(xs.length);
+        additionalMemory(xs.length);
         X[] result = makeCopy ? Arrays.copyOf(xs, xs.length) : xs;
         // CONSIDER don't copy but just allocate according to the xs/aux interchange optimization
         aux = Arrays.copyOf(xs, xs.length);
         sort(result, 0, result.length);
+        additionalMemory(-xs.length);
         return result;
     }
 
@@ -61,8 +66,6 @@ public class MergeSortBasic<X extends Comparable<X>> extends SortWithHelper<X> {
         sort(a, from, mid);
         sort(a, mid, to);
         helper.copyBlock(a, from, aux, from, n);
-//        helper.incrementCopies(n);
-//        helper.incrementHits(2 * n);
         merge(aux, a, from, mid, to);
     }
 
@@ -73,12 +76,14 @@ public class MergeSortBasic<X extends Comparable<X>> extends SortWithHelper<X> {
      * @param <Y> the underlying type of the elements.
      * @return the number of inversions in ys, which remains unchanged.
      */
-    public static <Y extends Comparable<Y>> int countInversions(Y[] ys) {
+    public static <Y extends Comparable<Y>> long countInversions(Y[] ys) {
         final Config config = Config.setupConfigFixes();
-        MergeSortBasic<Y> sorter = new MergeSortBasic<>(ys.length, config);
-        Y[] sorted = sorter.sort(ys, true); // CONSIDER passing false
-        InstrumentedHelper<Y> helper = (InstrumentedHelper<Y>) sorter.getHelper();
-        return helper.getFixes();
+        try (MergeSortBasic<Y> sorter = new MergeSortBasic<>(ys.length, config)) {
+            sorter.init(ys.length);
+            Y[] sorted = sorter.sort(ys, true); // CONSIDER passing false
+            BaseComparableHelper<Y> helper = (BaseComparableHelper<Y>) sorter.getHelper();
+            return helper.getFixes();
+        }
     }
 
     private void merge(X[] aux, X[] a, int lo, int mid, int hi) {
@@ -98,4 +103,27 @@ public class MergeSortBasic<X extends Comparable<X>> extends SortWithHelper<X> {
 
     private X[] aux = null;
     private final InsertionSort<X> insertionSort;
+
+
+    private int arrayMemory = -1;
+    private int additionalMemory;
+    private int maxMemory;
+
+    public void setArrayMemory(int n) {
+        if (arrayMemory == -1) {
+            arrayMemory = n;
+            additionalMemory(n);
+        }
+    }
+
+    public void additionalMemory(int n) {
+        additionalMemory += n;
+        if (maxMemory < additionalMemory) maxMemory = additionalMemory;
+    }
+
+    public Double getMemoryFactor() {
+        if (arrayMemory == -1)
+            throw new SortException("Array memory has not been set");
+        return 1.0 * maxMemory / arrayMemory;
+    }
 }

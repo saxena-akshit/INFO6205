@@ -121,7 +121,6 @@ public class Point implements Comparable<Point> {
      * @throws ClassCastException   if the specified object's type prevents it
      *                              from being compared to this object.
      */
-    @Override
     public int compareTo(Point other) {
         return Double.compare(this.distance(), other.distance());
     }

@@ -39,7 +39,7 @@ public class BSTOptimisedDeletion<Key extends Comparable<Key>, Value> implements
         if (node == null)
             return 0;
         else
-            return(size(node.smaller) + 1 + size(node.larger));
+            return (size(node.smaller) + 1 + size(node.larger));
     }
 
     public Boolean contains(Key key) {
@@ -196,7 +196,7 @@ public class BSTOptimisedDeletion<Key extends Comparable<Key>, Value> implements
 
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder("Node: " + key + ":" + value + " @ " + depth + " with count=" + count);
+            StringBuilder sb = new StringBuilder("Node: " + key + ":" + value + "@" + depth + " with count=" + count);
             if (smaller != null) sb.append(", smaller: ").append(smaller.key);
             if (larger != null) sb.append(", larger: ").append(larger.key);
             return sb.toString();
@@ -322,6 +322,7 @@ public class BSTOptimisedDeletion<Key extends Comparable<Key>, Value> implements
             return x;
         }
     }
+
     private Node deleteMax(Node x) {
         // CONSIDER using navigate
         if (x.larger == null) {
@@ -340,6 +341,7 @@ public class BSTOptimisedDeletion<Key extends Comparable<Key>, Value> implements
         else if (x.smaller == null) return x;
         else return min(x.smaller);
     }
+
     private Node max(Node x) {
         // CONSIDER using navigate
         if (x == null) throw new RuntimeException("max not implemented for null");
@@ -408,7 +410,7 @@ public class BSTOptimisedDeletion<Key extends Comparable<Key>, Value> implements
     private void show(Node node, StringBuffer sb, int indent) {
         // CONSIDER using navigate
         if (node == null) return;
-        for (int i = 0; i < indent; i++) sb.append("  ");
+        sb.append("  ".repeat(Math.max(0, indent)));
 //        sb.append(node.toString());
         sb.append(node.key);
         sb.append(": ");
@@ -417,12 +419,12 @@ public class BSTOptimisedDeletion<Key extends Comparable<Key>, Value> implements
         sb.append(" with count ").append(node.count);
         sb.append("\n");
         if (node.smaller != null) {
-            for (int i = 0; i <= indent; i++) sb.append("  ");
+            sb.append("  ".repeat(Math.max(0, indent + 1)));
             sb.append("smaller: ");
             show(node.smaller, sb, indent + 1);
         }
         if (node.larger != null) {
-            for (int i = 0; i <= indent; i++) sb.append("  ");
+            sb.append("  ".repeat(Math.max(0, indent + 1)));
             sb.append("larger: ");
             show(node.larger, sb, indent + 1);
         }

@@ -1,7 +1,6 @@
 package edu.neu.coe.info6205.graphs.dag;
 
 import edu.neu.coe.info6205.SizedIterable;
-import edu.neu.coe.info6205.SizedIterableImpl;
 import edu.neu.coe.info6205.bqs.Bag;
 import edu.neu.coe.info6205.bqs.Bag_Array;
 
@@ -17,13 +16,13 @@ import java.util.function.Consumer;
  */
 public class DAG_Impl<V, E> extends DiGraph<V, E> implements DAG<V, E> {
 
-    public SizedIterable<V> vertices() {
-        return SizedIterableImpl.create(adjacentEdges.keySet());
-    }
+//    public SizedIterable<V> vertices() {
+//        return SizedIterableImpl.create(adjacentEdges.keySet());
+//    }
 
-    public Iterable<Edge<V, E>> adjacent(V vertex) {
-        return adjacentEdges.get(vertex);
-    }
+//    public Iterable<Edge<V, E>> adjacent(V vertex) {
+//        return adjacentEdges.get(vertex);
+//    }
 
     public void dfs(V vertex, Consumer<V> pre, Consumer<V> post) {
         new DepthFirstSearch(new TreeSet<>(), pre, post).innerDfs(vertex);
@@ -52,9 +51,9 @@ public class DAG_Impl<V, E> extends DiGraph<V, E> implements DAG<V, E> {
         addEdge(new Edge<>(from, to, attributes));
     }
 
-    public String toString() {
-        return adjacentEdges.toString();
-    }
+//    public String toString() {
+//        return adjacentEdges.toString();
+//    }
 
     protected Bag<Edge<V, E>> getAdjacencyBag(V vertex) {
         return adjacentEdges.computeIfAbsent(vertex, k -> new Bag_Array<>(random));

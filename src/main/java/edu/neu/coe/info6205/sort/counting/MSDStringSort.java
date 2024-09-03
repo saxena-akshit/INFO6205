@@ -1,22 +1,37 @@
 package edu.neu.coe.info6205.sort.counting;
 
-import edu.neu.coe.info6205.sort.Helper;
-import edu.neu.coe.info6205.sort.HelperFactory;
-import edu.neu.coe.info6205.sort.SortWithHelper;
-import edu.neu.coe.info6205.sort.elementary.InsertionSortMSD;
+import edu.neu.coe.info6205.sort.*;
+import edu.neu.coe.info6205.sort.linearithmic.QuickSort_3way;
+import edu.neu.coe.info6205.util.CodePointMapper;
 import edu.neu.coe.info6205.util.Config;
+import edu.neu.coe.info6205.util.SuffixComparator;
 
 /**
  * Class to implement Most significant digit string sort (a radix sort).
  */
-public class MSDStringSort extends SortWithHelper<String> {
-    public MSDStringSort(Helper<String> helper) {
-        super(helper);
+public class MSDStringSort extends SortWithHelperAndAdditionalMemory<String> {
+
+    public static final String DESCRIPTION = "MSD string sort ";
+
+    /**
+     * Primary constructor.
+     *
+     * @param mapper the required CodePointMapper.
+     * @param helper the appropriate Helper.
+     */
+    private MSDStringSort(CodePointMapper mapper, Helper<String> helper) {
+        super(helper, (s, d) -> mapCodePoint(mapper, s, d));
+        this.mapper = mapper; // CONSIDER remove this: all we actually need is the range.
     }
 
-    public MSDStringSort(String description, int N, Config config) {
-        this(HelperFactory.create(description, N, config));
+    public MSDStringSort(CodePointMapper mapper, String description, int N, Config config, int nRuns) {
+        this(mapper, HelperFactory.createGeneric(description, mapper.comparator, N, nRuns, config));
+        init(N);
         closeHelper = true;
+    }
+
+    public MSDStringSort(CodePointMapper mapper, int N, int nRuns, Config config) {
+        this(mapper, DESCRIPTION + mapper + " with cutoff=" + config.getString(Config.HELPER, Config.MSDCUTOFF, InstrumentedComparableHelper.MSD_CUTOFF_DEFAULT + ""), N, config, nRuns);
     }
 
     /**
@@ -27,45 +42,87 @@ public class MSDStringSort extends SortWithHelper<String> {
      * @param to   the index of the first element not to sort.
      */
     public void sort(String[] xs, int from, int to) {
-        sort(xs, getHelper(), from, to, 0);
+        doSort(xs, from, to, 0);
     }
 
     /**
-     * Sort from a[lo] to a[hi] (exclusive), ignoring the first d characters of each String.
+     * Sort from xs[from] to xs[to] (exclusive), ignoring the first d characters of each String.
      * This method is recursive.
      *
-     * @param a      the array to be sorted.
-     * @param helper the Helper.
-     * @param lo     the low index.
-     * @param hi     the high index (one above the highest actually processed).
-     * @param d      the number of characters in each String to be skipped.
+     * @param xs   the array to be sorted.
+     * @param from the low index.
+     * @param to   the high index (one above the highest actually processed).
+     * @param d    the number of characters in each String to be skipped.
      */
-    private static void sort(String[] a, Helper<String> helper, int lo, int hi, int d) {
-        if (hi < lo + cutoff) InsertionSortMSD.sort(a, lo, hi, d);
-        else {
-            String[] aux = new String[hi - lo];       // CONSIDER having an aux which does for all levels. Is that even possible?
-            int[] count = new int[radix + 2];        // Compute frequency counts.
-            for (int i = lo; i < hi; i++)
-                count[charAt(a[i], d) + 2]++;
-            for (int r = 0; r < radix + 1; r++)      // Transform counts to indices.
-                count[r + 1] += count[r];
-            for (int i = lo; i < hi; i++)     // Distribute.
-                // TODO use helper.get(a,i) instead of a[i].
-                helper.copy(a, i, aux, count[charAt(a[i], d) + 1]++); //aux[count[charAt(a[i], d) + 1]++] = a[i];
-            // Copy back.
-            if (hi - lo >= 0) helper.copyBlock(aux, 0, a, lo, hi - lo);
-            // Recursively sort for each character value.
-            // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+    private void doSort(String[] xs, int from, int to, int d) {
+        int n = to - from;
+        if (n <= 1)
+            return;
+        // NOTE that we never cut over to Quicksort at the top-level.
+        if (d > 0 && n <= helper.MSDCutoff()) cutToQuicksort(xs, from, to, d, n);
+        else doMSDrecursive(xs, from, to, d);
+    }
+
+    private void cutToQuicksort(String[] xs, int from, int to, int d, int n) {
+        SuffixComparator suffixComparator = new SuffixComparator(helper.getComparator(), d);
+        Helper<String> cloned = helper.clone("MSD 3-way quicksort", suffixComparator, n);
+        try (Sort<String> sorter = new QuickSort_3way<>(cloned)) {
+            sorter.sort(xs, from, to);
         }
     }
 
-    private static int charAt(String s, int d) {
-        if (d < s.length()) return s.charAt(d);
-        else return -1;
+    private void doMSDrecursive(String[] xs, int from, int to, int d) {
+        int n = to - from;
+        String[] aux = new String[n]; // CONSIDER optimizing the usage of aux.
+        additionalMemory(n);
+        int[] count = new int[mapper.range + 1];
+        additionalMemory(mapper.range + 1);
+
+        // Compute frequency counts.
+        helper.incrementHits(n); // for the count.
+        for (int i = from; i < to; i++) count[classify(xs, i, d) + 1]++;
+
+        // Accumulate counts.
+        int countR = count[0];
+        for (int r = 1; r < mapper.range; r++) {
+            helper.incrementHits(1); // for the count.
+            count[r] += countR;
+            countR = count[r];
+        }
+
+        // Distribute.
+        helper.distributeBlock(xs, from, to, aux, x -> count[classify(x, d)]++);
+
+        // Copy back.
+        helper.copyBlock(aux, 0, xs, from, n);
+
+        // Recursively sort on the next character position in each String.
+        // TO BE IMPLEMENTED 
+        // END SOLUTION
+        additionalMemory(-(n + mapper.range + 1));
     }
 
-    private static final int radix = 256;
-    private static final int cutoff = 15;
-//    private static String[] aux;       // auxiliary array for distribution
+    private static int mapCodePoint(CodePointMapper mapper, String x, int d) {
+        return mapper.map(charAt(x, d));
+    }
+
+    private final CodePointMapper mapper;
+
+    private static int charAt(String s, int d) {
+        if (d < s.length()) return s.charAt(d);
+        else return 0; // CONSIDER creating a value in CodePointMapper to specify this.
+    }
+
+    static class QuickSortThreeWayByFunction extends QuickSort_3way<String> {
+
+        public QuickSortThreeWayByFunction(Helper<String> helper) {
+            super(helper);
+        }
+    }
+
+    @Override
+    public void close() {
+        if (closeHelper) helper.close();
+        super.close();
+    }
 }

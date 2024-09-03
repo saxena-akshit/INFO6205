@@ -5,16 +5,15 @@
 package edu.neu.coe.info6205.sort.linearithmic;
 
 import edu.neu.coe.info6205.sort.*;
-import edu.neu.coe.info6205.util.Config;
-import edu.neu.coe.info6205.util.LazyLogger;
-import edu.neu.coe.info6205.util.PrivateMethodTester;
-import edu.neu.coe.info6205.util.StatPack;
+import edu.neu.coe.info6205.util.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
+import static edu.neu.coe.info6205.util.SortBenchmarkHelper.getWords;
 import static edu.neu.coe.info6205.util.Utilities.round;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -22,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 @SuppressWarnings("ALL")
 public class QuickSort3WayTest {
 
+    // NOTE this doesn't test quicksort because cutoff is set to the default.
     @Test
     public void testSort() throws Exception {
         Integer[] xs = new Integer[4];
@@ -29,7 +29,7 @@ public class QuickSort3WayTest {
         xs[1] = 4;
         xs[2] = 2;
         xs[3] = 1;
-        GenericSort<Integer> s = new QuickSort_3way<>(xs.length, config);
+        Sort<Integer> s = new QuickSort_3way<>(xs.length, config);
         Integer[] ys = s.sort(xs);
         assertEquals(Integer.valueOf(1), ys[0]);
         assertEquals(Integer.valueOf(2), ys[1]);
@@ -39,12 +39,12 @@ public class QuickSort3WayTest {
 
     @Test
     public void testSortWithInstrumenting0() throws Exception {
-        int n = 16;
-        final SortWithHelper<Integer> sorter = new QuickSort_3way<>(n, 1L, config);
+        int n = 64;
+        final SortWithHelper<Integer> sorter = new QuickSort_3way<>(n, 3L, config);
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(10));
         final Integer[] sorted = sorter.sort(xs);
-        assertTrue(helper.sorted(sorted));
+        assertTrue(helper.isSorted(sorted));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class QuickSort3WayTest {
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(97));
         final Integer[] sorted = sorter.sort(xs);
-        assertTrue(helper.sorted(sorted));
+        assertTrue(helper.isSorted(sorted));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class QuickSort3WayTest {
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(100));
         final Integer[] sorted = sorter.sort(xs);
-        assertTrue(helper.sorted(sorted));
+        assertTrue(helper.isSorted(sorted));
     }
 
     @Test
@@ -74,7 +74,7 @@ public class QuickSort3WayTest {
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(1000));
         final Integer[] sorted = sorter.sort(xs);
-        assertTrue(helper.sorted(sorted));
+        assertTrue(helper.isSorted(sorted));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class QuickSort3WayTest {
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(10000));
         final Integer[] sorted = sorter.sort(xs);
-        assertTrue(helper.sorted(sorted));
+        assertTrue(helper.isSorted(sorted));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class QuickSort3WayTest {
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(10000));
         final Integer[] sorted = sorter.sort(xs);
-        assertTrue(helper.sorted(sorted));
+        assertTrue(helper.isSorted(sorted));
     }
 
     @Test
@@ -103,8 +103,10 @@ public class QuickSort3WayTest {
         char[] charArray = testString.toCharArray();
         Character[] array = new Character[charArray.length];
         for (int i = 0; i < array.length; i++) array[i] = charArray[i];
-        final Config config = Config.setupConfig("true", "0", "1", "", "");
-        QuickSort<Character> sorter = new QuickSort_3way<Character>(array.length, config);
+        final Config config = Config.setupConfig("true", "false", "0", "1", "", "");
+        final NonComparableHelper<Character> helper = HelperFactory.create("3-way quick sort", array.length, config);
+        QuickSort<Character> sorter = new QuickSort_3way<>(helper);
+        sorter.init(array.length);
         Partitioner<Character> partitioner = sorter.partitioner;
         List<Partition<Character>> partitions = partitioner.partition(QuickSort.createPartition(array));
         assertEquals(2, partitions.size());
@@ -118,6 +120,14 @@ public class QuickSort3WayTest {
         for (int i = 0; i < chars.length; i++) chars[i] = array[i];
         String partitionedString = new String(chars);
         assertEquals("BADCPPPPPVWZYX", partitionedString);
+        sorter.postProcess(new Character[1]);
+        final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
+        final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
+        final int compares = (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean();
+        final int swaps = (int) statPack.getStatistics(InstrumentedComparableHelper.SWAPS).mean();
+        assertEquals(14, compares);
+        assertEquals(9, swaps);
+        assertEquals(compares + swaps + 1, (int) statPack.getStatistics(InstrumentedComparableHelper.HITS).mean());
     }
 
     @Test
@@ -126,8 +136,10 @@ public class QuickSort3WayTest {
         char[] charArray = testString.toCharArray();
         Character[] array = new Character[charArray.length];
         for (int i = 0; i < array.length; i++) array[i] = charArray[i];
-        final Config config = Config.setupConfig("true", "0", "1", "", "");
-        QuickSort<Character> sorter = new QuickSort_3way<Character>(array.length, config);
+        final Config config = Config.setupConfig("true", "false", "0", "1", "", "");
+        final NonComparableHelper<Character> helper = HelperFactory.create("3-way quick sort", array.length, config);
+        QuickSort<Character> sorter = new QuickSort_3way<>(helper);
+        sorter.init(array.length);
         Partitioner<Character> partitioner = sorter.partitioner;
         List<Partition<Character>> partitions = partitioner.partition(QuickSort.createPartition(array));
         assertEquals(2, partitions.size());
@@ -141,6 +153,26 @@ public class QuickSort3WayTest {
         for (int i = 0; i < chars.length; i++) chars[i] = array[i];
         String partitionedString = new String(chars);
         assertEquals("EACFKLVZQTRMSY", partitionedString);
+        sorter.postProcess(new Character[1]);
+        final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
+        final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
+        final int compares = (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean();
+        final int swaps = (int) statPack.getStatistics(InstrumentedComparableHelper.SWAPS).mean();
+        assertEquals(14, compares);
+        assertEquals(13, swaps);
+        assertEquals(compares + swaps + 1, (int) statPack.getStatistics(InstrumentedComparableHelper.HITS).mean());
+    }
+
+    @Test
+    public void testSortA() throws Exception {
+        Integer[] xs = new Integer[]{3, 4, 2, 1, 4, 1, 2, 3, 2, 1};
+        Sort<Integer> s = new QuickSort_3way<>(xs.length, Config.load(getClass()).setupConfig("true", "false", "0", "1", "1", ""));
+        Integer[] ys = s.sort(xs);
+        assertEquals(Integer.valueOf(1), ys[0]);
+        assertEquals(Integer.valueOf(1), ys[1]);
+        assertEquals(Integer.valueOf(1), ys[2]);
+        assertEquals(Integer.valueOf(2), ys[3]);
+        assertEquals(Integer.valueOf(4), ys[9]);
     }
 
     @Test
@@ -149,8 +181,8 @@ public class QuickSort3WayTest {
         int N = (int) Math.pow(2, k);
         // NOTE this depends on the cutoff value for quick sort.
         int levels = k - 2;
-        final Config config = Config.setupConfig("true", "0", "1", "", "");
-        final BaseHelper<Integer> helper = (BaseHelper<Integer>) HelperFactory.create("merge sort", N, config);
+        final Config config = Config.setupConfig("true", "true", "0", "1", "", "");
+        final NonComparableHelper<Integer> helper = HelperFactory.create("3-way quick sort", N, config);
         System.out.println(helper);
         Sort<Integer> s = new QuickSort_3way<>(helper);
         s.init(N);
@@ -158,47 +190,79 @@ public class QuickSort3WayTest {
         assertEquals(Integer.valueOf(1360), xs[0]);
         helper.preProcess(xs);
         Integer[] ys = s.sort(xs);
-        assertTrue(helper.sorted(ys));
+        assertTrue(helper.isSorted(ys));
         helper.postProcess(ys);
         final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
         final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
         System.out.println(statPack);
-        final int compares = (int) statPack.getStatistics(InstrumentedHelper.COMPARES).mean();
-        final int inversions = (int) statPack.getStatistics(InstrumentedHelper.INVERSIONS).mean();
-        final int fixes = (int) statPack.getStatistics(InstrumentedHelper.FIXES).mean();
-        final int swaps = (int) statPack.getStatistics(InstrumentedHelper.SWAPS).mean();
-        final int copies = (int) statPack.getStatistics(InstrumentedHelper.COPIES).mean();
-        final int worstCompares = round(2.0 * N * Math.log(N));
+        final int compares = (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean();
+        final int inversions = (int) statPack.getStatistics(Instrumenter.INVERSIONS).mean();
+        final int fixes = (int) statPack.getStatistics(InstrumentedComparableHelper.FIXES).mean();
+        final int swaps = (int) statPack.getStatistics(InstrumentedComparableHelper.SWAPS).mean();
+        final int hits = (int) statPack.getStatistics(InstrumentedComparableHelper.HITS).mean();
+        final long worstCompares = round(2.0 * N * Math.log(N));
         System.out.println("compares: " + compares + ", worstCompares: " + worstCompares);
         assertTrue(compares <= worstCompares);
         assertTrue(inversions <= fixes);
+        assertEquals(swaps + compares, hits, 1000);
+    }
+
+    //    @Test  CONSIDER re-instituting
+    public void testSortHuge() throws Exception {
+        int k = 16;
+        int N = (int) Math.pow(2, k);
+        final Config config = Config.setupConfig("true", "false", "0", "1", "", "");
+        final NonComparableHelper<String> helper = HelperFactory.create("3-way quick sort", N, config);
+        String[] words = getWords("eng-uk_web_2002_100K-sentences.txt", SortBenchmark::getLeipzigWords);
+        String[] xs = Utilities.fillRandomArray(String.class, new Random(0L), N, r -> words[r.nextInt(words.length)]);
+        Sort<String> s = new QuickSort_3way<>(helper);
+        s.init(N);
+        helper.preProcess(xs);
+        String[] ys = s.sort(xs);
+        assertTrue(helper.isSorted(ys));
+        helper.postProcess(ys);
+        final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
+        final StatPack statPack = (StatPack) privateMethodTester.invokePrivate("getStatPack");
+        System.out.println(statPack);
+        final int compares = (int) statPack.getStatistics(InstrumentedComparableHelper.COMPARES).mean();
+        final int inversions = (int) statPack.getStatistics(Instrumenter.INVERSIONS).mean();
+        final int fixes = (int) statPack.getStatistics(InstrumentedComparableHelper.FIXES).mean();
+        final int swaps = (int) statPack.getStatistics(InstrumentedComparableHelper.SWAPS).mean();
+        final int hits = (int) statPack.getStatistics(InstrumentedComparableHelper.HITS).mean();
+        final long worstCompares = round(2.0 * N * Math.log(N));
+        System.out.println("compares: " + compares + ", worstCompares: " + worstCompares);
+        assertTrue(compares <= worstCompares);
+        assertTrue(inversions <= fixes);
+        assertEquals(swaps + compares, hits, 100000);
     }
 
     @Test
     public void testPartitionWithSort() {
         String[] xs = new String[]{"g", "f", "e", "d", "c", "b", "a"};
         int n = xs.length;
-        final Config config = Config.setupConfig("true", "0", "1", "", "");
-        final BaseHelper<String> helper = new InstrumentedHelper<>("test", config);
+        final Config config = Config.setupConfig("true", "true", "0", "1", "", "");
+        final NonComparableHelper<String> helper = new InstrumentedComparableHelper<>("test", config);
         final PrivateMethodTester privateMethodTester = new PrivateMethodTester(helper);
         QuickSort<String> sorter = new QuickSort_3way<>(helper);
         int inversions = n * (n - 1) / 2;
         assertEquals(inversions, helper.inversions(xs));
         Partitioner<String> partitioner = sorter.createPartitioner();
         List<Partition<String>> partitions = partitioner.partition(new Partition<>(xs, 0, xs.length));
-        assertEquals(14, privateMethodTester.invokePrivate("getFixes"));
+        assertEquals(14L, privateMethodTester.invokePrivate("getFixes"));
         assertEquals(7, helper.inversions(xs));
         sorter.sort(xs, 0, partitions.get(0).to, 0);
-        assertEquals(14, privateMethodTester.invokePrivate("getFixes"));
+        assertEquals(14L, privateMethodTester.invokePrivate("getFixes"));
         assertEquals(7, helper.inversions(xs));
         sorter.sort(xs, partitions.get(1).from, n, 0);
         assertEquals(0, helper.inversions(xs));
-        assertTrue(helper.sorted(xs));
-        int fixes = (int) privateMethodTester.invokePrivate("getFixes");
+        assertTrue(helper.isSorted(xs));
+        long fixes = (long) privateMethodTester.invokePrivate("getFixes");
         // NOTE: there are at least as many fixes as inversions -- sort methods aren't necessarily perfectly efficient in terms of swaps.
         System.out.println("inversions: " + inversions + ", fixes: " + fixes);
         assertTrue(inversions <= fixes);
-        assertEquals(14, privateMethodTester.invokePrivate("getSwaps")); // XXX check this
+        assertEquals(13L, privateMethodTester.invokePrivate("getSwaps")); // XXX check this
+        assertEquals(16L, privateMethodTester.invokePrivate("getCompares")); // XXX check this
+        assertEquals(24L, privateMethodTester.invokePrivate("getHits")); // XXX check this
     }
 
     final static LazyLogger logger = new LazyLogger(QuickSort_3way.class);

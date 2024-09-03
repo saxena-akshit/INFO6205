@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * This class models Zeckendorf's Theorem: https://en.wikipedia.org/wiki/Zeckendorf%27s_theorem
+ * This class models Zeckendorf's Theorem: <a href="https://en.wikipedia.org/wiki/Zeckendorf%27s_theorem">...</a>
  * It is an example of a greedy algorithm.
  * This class does all its work directly (without using the Greedy class);
  * for an example of Zeckendorf which does use Greedy, please see GreedyTest.java

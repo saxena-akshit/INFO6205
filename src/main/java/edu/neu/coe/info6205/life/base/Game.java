@@ -15,7 +15,6 @@ public class Game implements Generational<Game, Grid>, Countable, Renderable {
      *
      * @return the number of live cells.
      */
-    @Override
     public int getCount() {
         return grid.getCount();
     }
@@ -52,13 +51,11 @@ public class Game implements Generational<Game, Grid>, Countable, Renderable {
         return Objects.hash(grid);
     }
 
-    @Override
     public Game generation(BiConsumer<Long, Grid> monitor) {
         monitor.accept(generation, grid);
         return new Game(generation + 1, grid.generation(this.monitor), this.monitor);
     }
 
-    @Override
     public String render() {
         return grid.render();
     }

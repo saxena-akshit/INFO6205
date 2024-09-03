@@ -14,9 +14,9 @@ import static org.junit.Assert.*;
 
 public class SortTest {
 
-    static class TestSorter extends SortWithHelper<Integer> {
+    static class TestSorter extends SortWithComparableHelper<Integer> {
         public TestSorter(String description, int N, Config config) {
-            super(description, N, config);
+            super(description, N, 1, config);
         }
 
         /**
@@ -56,27 +56,19 @@ public class SortTest {
     @Test
     public void testSort3() throws IOException {
         final Config config = Config.load(getClass());
-        final SortWithHelper<Integer> sorter = new SortWithHelper<Integer>("test", 100, config) {
+        final SortWithHelper<Integer> sorter = new SortWithComparableHelper<>("test", 100, 1, config) {
             public void sort(Integer[] xs, int from, int to) {
                 // Do nothing.
             }
 
-            /**
-             * Method to post-process an array after sorting.
-             * <p>
-             * In this implementation, the post-processing verifies that xs is sorted.
-             *
-             * @param xs the array to be post-processed.
-             * @throws BaseHelper.HelperException if the array xs is not sorted.
-             */
             public void postProcess(Integer[] xs) {
-                if (!getHelper().sorted(xs)) throw new BaseHelper.HelperException("Array is not sorted");
+                if (!getHelper().isSorted(xs)) throw new HelperException("Array is not sorted");
             }
         };
         final Helper<Integer> helper = sorter.getHelper();
         final Integer[] xs = helper.random(Integer.class, r -> r.nextInt(1000000));
         sorter.sort(xs, 0, xs.length);
-        assertFalse("array should not be sorted - except under extremely rare circumstances", helper.sorted(xs));
+        assertFalse("array should not be sorted - except under extremely rare circumstances", helper.isSorted(xs));
     }
 
     @Test

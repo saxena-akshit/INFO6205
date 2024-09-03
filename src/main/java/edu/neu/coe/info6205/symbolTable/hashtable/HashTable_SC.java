@@ -27,7 +27,7 @@ public class HashTable_SC<Key, Value> implements ST<Key, Value> {
      * If the key already exists, then its value will simply be overwritten.
      * If the value provided is null, we should CONSIDER performing a deletion.
      *
-     * @param key the key.
+     * @param key   the key.
      * @param value the value.
      */
     public void put(Key key, Value value) {
@@ -130,7 +130,6 @@ public class HashTable_SC<Key, Value> implements ST<Key, Value> {
         private final Key key;
         private Value value;
         // NOTE: this will need to be mutable when we implement delete.
-        @SuppressWarnings("FieldMayBeFinal")
-        private Node next;
+        private final Node next;
     }
 }

@@ -25,7 +25,7 @@ public class BFSTest {
         expected.add(3);
         expected.add(1);
 
-        Assert.assertEquals(expected,g.BFS(2));
+        Assert.assertEquals(expected, g.traverse(2));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class BFSTest {
         expected1.add(2);
         expected1.add(5);
 
-        Assert.assertEquals(expected1,g.BFS(0));
+        Assert.assertEquals(expected1, g.traverse(0));
     }
 
     @Test
@@ -74,7 +74,7 @@ public class BFSTest {
         expected.add(4);
         expected.add(5);
 
-        Assert.assertEquals(expected,g.BFS(0));
+        Assert.assertEquals(expected, g.traverse(0));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class BFSTest {
         expected.add(4);
         expected.add(5);
 
-        Assert.assertEquals(expected,g.BFS(0));
+        Assert.assertEquals(expected, g.traverse(0));
     }
 
 }

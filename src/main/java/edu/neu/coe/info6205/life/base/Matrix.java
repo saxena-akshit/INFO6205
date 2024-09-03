@@ -9,7 +9,7 @@ import java.util.function.BiFunction;
  * By convention, it must have clear rows and columns around any live cells.
  * <p>
  * This class was designed to optimize the performance of Groups.
- * However, it hasn't been thoroughly tested and I'm fairly sure it needs significant work.
+ * However, it hasn't been thoroughly tested, and I'm fairly sure it needs significant work.
  */
 class Matrix {
     /**
@@ -71,7 +71,7 @@ class Matrix {
     @Override
     public int hashCode() {
         int result = Objects.hash(width, height, count, fit);
-        result = 31 * result + Arrays.hashCode(cells);
+        result = 31 * result + Arrays.deepHashCode(cells);
         return result;
     }
 
@@ -178,7 +178,7 @@ class Matrix {
 
         @Override
         public String toString() {
-            for (int i = 0; i < width; i++) sb.append(Dash);
+            sb.append(Dash.repeat(Math.max(0, width)));
             sb.append(Newline);
             for (int j = 0; j < height; j++) {
                 sb.append(Vbar);
@@ -187,7 +187,7 @@ class Matrix {
                 sb.append(Vbar).append(Newline);
             }
             sb.append(Space);
-            for (int i = 0; i < width; i++) sb.append(Dash);
+            sb.append(Dash.repeat(Math.max(0, width)));
             sb.append(Newline);
             return sb.toString();
         }
@@ -612,7 +612,7 @@ class Matrix {
     private int count;
 
     /**
-     * This indicates whether all of the points fit inside the single outer rows/columns of this Matrix.
+     * This indicates whether all the points fit inside the single outer rows/columns of this Matrix.
      */
     // TODO implement me
     private final boolean fit;

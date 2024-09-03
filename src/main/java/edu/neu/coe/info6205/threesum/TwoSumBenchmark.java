@@ -38,16 +38,16 @@ throw new RuntimeException("implementation missing");
     }
 
     private final static TimeLogger[] timeLoggersCubic = {
-            new TimeLogger("Raw time per run (mSec): ", (time, n) -> time),
-            new TimeLogger("Normalized time per run (n^3): ", (time, n) -> time / n / n / n * 1e6)
+            new TimeLogger("Raw time per run (mSec): ", null),
+            new TimeLogger("Normalized time per run (n^3): ", n -> 1.0 / 6 * n * n * n)
     };
     private final static TimeLogger[] timeLoggersQuadrithmic = {
-            new TimeLogger("Raw time per run (mSec): ", (time, n) -> time),
-            new TimeLogger("Normalized time per run (n^2 log n): ", (time, n) -> time / n / n / Utilities.lg(n) * 1e6)
+            new TimeLogger("Raw time per run (mSec): ", null),
+            new TimeLogger("Normalized time per run (n^2 log n): ", n -> n * n * Utilities.lg(n))
     };
     private final static TimeLogger[] timeLoggersQuadratic = {
-            new TimeLogger("Raw time per run (mSec): ", (time, n) -> time),
-            new TimeLogger("Normalized time per run (n^2): ", (time, n) -> time / n / n * 1e6)
+            new TimeLogger("Raw time per run (mSec): ", null),
+            new TimeLogger("Normalized time per run (n^2): ", n -> 1.0 / 2 * n * n)
     };
 
     private final int runs;

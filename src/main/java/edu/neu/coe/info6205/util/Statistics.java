@@ -1,16 +1,29 @@
 package edu.neu.coe.info6205.util;
 
+import edu.neu.coe.info6205.sort.SortException;
+
 import java.util.function.Function;
 
 public class Statistics {
 
-    public Statistics(String property, Function<Double, Double> normalizer, int N) {
+    /**
+     * Constructor for Statistics.
+     *
+     * @param property   the particular property we're keeping track of.
+     * @param normalizer the normalizer for the results (for example 1/n lg n).
+     * @param nRuns      the number of runs.
+     * @param size       the size of the problem.
+     */
+    public Statistics(String property, Function<Double, Double> normalizer, int nRuns, int size) {
         this.property = property;
         this.normalizer = normalizer;
-        doubles = new double[N];
+        doubles = new double[nRuns];
+        this.size = size;
     }
 
     public void add(double x) {
+        if (doubles.length == 0)
+            throw new SortException("Statistics: doubles is empty");
         if (count >= doubles.length) resize(2 * doubles.length);
         doubles[count] = x;
         count = count + 1;
@@ -49,11 +62,11 @@ public class Statistics {
         final StringBuilder sb = new StringBuilder().append(property).append(": ");
         if (updated) {
             final boolean stats = stdDev() > 0.0;
-            final String s = stats ? "mean=" : "";
+            final String s = "mean=";
             sb.append(s).append(Utilities.asInt(mean()));
             if (stats)
                 sb.append("; stdDev=").append(Utilities.asInt(stdDev()));
-            sb.append(", normalized=").append(Utilities.formatDecimal3Places(normalizedMean()));
+            sb.append("; normalized=").append(Utilities.formatDecimal3Places(normalizedMean()));
         } else
             sb.append("<unset>");
         return sb.toString();
@@ -62,7 +75,7 @@ public class Statistics {
     public static final Function<Double, Double> NORMALIZER_LINEARITHMIC_NATURAL = x -> Math.log(x) * x;
 
     public double normalizedMean() {
-        return mean() / normalizer.apply((double) doubles.length);
+        return mean() / normalizer.apply((double) size);
     }
 
     private void resize(int n) {
@@ -83,6 +96,7 @@ public class Statistics {
     private int count = 0;
     private final Function<Double, Double> normalizer;
     private double[] doubles;
+    private final int size;
     private final String property;
     private boolean updated = false;
 

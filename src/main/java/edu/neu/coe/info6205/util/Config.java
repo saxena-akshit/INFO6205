@@ -1,6 +1,7 @@
 package edu.neu.coe.info6205.util;
 
-import edu.neu.coe.info6205.sort.BaseHelper;
+import edu.neu.coe.info6205.sort.BaseComparableHelper;
+import edu.neu.coe.info6205.sort.Instrumenter;
 import org.ini4j.Ini;
 import org.ini4j.Profile;
 
@@ -13,7 +14,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static edu.neu.coe.info6205.sort.InstrumentedHelper.*;
+import static edu.neu.coe.info6205.sort.InstrumentedComparableHelper.*;
 import static edu.neu.coe.info6205.sort.linearithmic.MergeSort.INSURANCE;
 import static edu.neu.coe.info6205.sort.linearithmic.MergeSort.NOCOPY;
 
@@ -63,11 +64,21 @@ public class Config {
         return Long.parseLong(s);
     }
 
+    public String getString(String sectionName, String optionName, String defaultValue) {
+        final String s = get(sectionName, optionName);
+        if (s == null || s.isEmpty()) return defaultValue;
+        return s;
+    }
+
     public String getComment(String key) {
         final String comment = ini.getComment(key);
         if (unLogged(key))
             logger.debug(() -> "Config.getComment(" + key + ") = " + comment);
         return comment;
+    }
+
+    public long getSeed() {
+        return getLong(HELPER, SEED, System.currentTimeMillis());
     }
 
     public Collection<Profile.Section> getAll(Object key) {
@@ -80,10 +91,6 @@ public class Config {
 
     public Profile.Section get(Object key, int index) {
         return ini.get(key, index);
-    }
-
-    public Profile.Section getOrDefault(Object key, Profile.Section defaultValue) {
-        return ini.getOrDefault(key, defaultValue);
     }
 
     public Config(Ini ini) {
@@ -114,7 +121,7 @@ public class Config {
      * Method to determine if this configuration has an instrumented helper.
      * NOTE: we would prefer to place this logic in the Helper class but we put it here for now.
      *
-     * @return true if helper is instrument
+     * @return true if helper is instrumented
      */
     public boolean isInstrumented() {
         return getBoolean(HELPER, INSTRUMENT);
@@ -122,7 +129,7 @@ public class Config {
 
     // CONSIDER: sort these out.
     public static final String HELPER = "helper";
-    public static final String INSTRUMENT = BaseHelper.INSTRUMENT;
+    public static final String INSTRUMENT = BaseComparableHelper.INSTRUMENT;
 
     /**
      * Method to load the appropriate configuration.
@@ -151,19 +158,26 @@ public class Config {
 
     public static final String SEED = "seed";
     public static final String CUTOFF = "cutoff";
+    public static final String MSDCUTOFF = "msdcutoff";
 
-    public static Config setupConfig(final String instrumenting, final String seed, final String inversions, String cutoff, String interimInversions) {
+    /**
+     * The ideal cutoff for both Mergesort and Dualpivotquicksort is 20
+     */
+    public static final int CUTOFF_DEFAULT = 20;
+
+    public static Config setupConfig(final String instrumenting, String fixes, final String seed, final String inversions, String cutoff, String interimInversions) {
         final Ini ini = new Ini();
         final String sInstrumenting = INSTRUMENTING;
         ini.put(Config.HELPER, Config.INSTRUMENT, instrumenting);
         ini.put(Config.HELPER, SEED, seed);
         ini.put(Config.HELPER, CUTOFF, cutoff);
-        ini.put(sInstrumenting, INVERSIONS, inversions);
+        ini.put(sInstrumenting, Instrumenter.INVERSIONS, inversions);
         ini.put(sInstrumenting, SWAPS, instrumenting);
         ini.put(sInstrumenting, COMPARES, instrumenting);
         ini.put(sInstrumenting, COPIES, instrumenting);
-        ini.put(sInstrumenting, FIXES, instrumenting);
+        ini.put(sInstrumenting, FIXES, fixes);
         ini.put(sInstrumenting, HITS, instrumenting);
+        ini.put(sInstrumenting, LOOKUPS, instrumenting);
         ini.put("huskyhelper", "countinteriminversions", interimInversions);
         return new Config(ini);
     }
@@ -175,7 +189,7 @@ public class Config {
         ini.put(Config.HELPER, Config.INSTRUMENT, instrumenting);
         ini.put(Config.HELPER, SEED, seed);
         ini.put(Config.HELPER, CUTOFF, cutoff);
-        ini.put(sInstrumenting, INVERSIONS, inversions);
+        ini.put(sInstrumenting, Instrumenter.INVERSIONS, inversions);
         ini.put(sInstrumenting, SWAPS, instrumenting);
         ini.put(sInstrumenting, COMPARES, instrumenting);
         ini.put(sInstrumenting, COPIES, instrumenting);
@@ -189,7 +203,7 @@ public class Config {
     public static Config setupConfigFixes() {
         final Ini ini = new Ini();
         ini.put(Config.HELPER, Config.INSTRUMENT, true);
-        ini.put(Config.HELPER, CUTOFF, 0);
+        ini.put(Config.HELPER, CUTOFF, CUTOFF_DEFAULT);
         ini.put(INSTRUMENTING, FIXES, true);
         return new Config(ini);
     }

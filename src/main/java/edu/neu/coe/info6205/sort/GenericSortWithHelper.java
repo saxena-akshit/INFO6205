@@ -2,19 +2,21 @@ package edu.neu.coe.info6205.sort;
 
 import edu.neu.coe.info6205.util.Config;
 
+import java.util.Comparator;
+
 /**
- * Abstract class GenericSortWithGenericHelper which extends GenericSort.
+ * Abstract class GenericSortWithHelper which extends Sort.
  *
  * @param <X> the underlying type which does not have to be Comparable.
  */
-public abstract class GenericSortWithGenericHelper<X> implements GenericSort<X> {
+public abstract class GenericSortWithHelper<X> implements Sort<X> {
 
-    public GenericSortWithGenericHelper(GenericHelper<X> helper) {
+    public GenericSortWithHelper(Helper<X> helper) {
         this.helper = helper;
     }
 
-    public GenericSortWithGenericHelper(String description, int N, Config config) {
-        this(HelperFactory.createGeneric(description, N, config));
+    public GenericSortWithHelper(String description, Comparator<X> comparator, int N, int nRuns, Config config) {
+        this(HelperFactory.createGeneric(description, comparator, N, nRuns, config));
         closeHelper = true;
     }
 
@@ -23,7 +25,7 @@ public abstract class GenericSortWithGenericHelper<X> implements GenericSort<X> 
      *
      * @return the Helper
      */
-    public GenericHelper<X> getHelper() {
+    public Helper<X> getHelper() {
         return helper;
     }
 
@@ -36,7 +38,7 @@ public abstract class GenericSortWithGenericHelper<X> implements GenericSort<X> 
         if (closeHelper) helper.close();
     }
 
-    private final GenericHelper<X> helper;
+    private final Helper<X> helper;  // CONSIDER making this protected
     protected boolean closeHelper = false;
 
 }

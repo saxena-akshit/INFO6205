@@ -3,14 +3,14 @@
  */
 package edu.neu.coe.info6205.sort.elementary;
 
-import edu.neu.coe.info6205.sort.BaseHelper;
 import edu.neu.coe.info6205.sort.Helper;
-import edu.neu.coe.info6205.sort.SortWithHelper;
+import edu.neu.coe.info6205.sort.NonInstrumentingComparableHelper;
+import edu.neu.coe.info6205.sort.SortWithComparableHelper;
 import edu.neu.coe.info6205.util.Config;
 
 import java.io.IOException;
 
-public class SelectionSort<X extends Comparable<X>> extends SortWithHelper<X> {
+public class SelectionSort<X extends Comparable<X>> extends SortWithComparableHelper<X> {
 
     /**
      * Constructor for SelectionSort
@@ -19,11 +19,11 @@ public class SelectionSort<X extends Comparable<X>> extends SortWithHelper<X> {
      * @param config the configuration.
      */
     public SelectionSort(int N, Config config) {
-        super(DESCRIPTION, N, config);
+        super(DESCRIPTION, N, 1, config);
     }
 
     public SelectionSort(Config config) {
-        this(new BaseHelper<>(DESCRIPTION, config));
+        this(new NonInstrumentingComparableHelper<>(DESCRIPTION, config));
     }
 
     /**
@@ -53,7 +53,9 @@ public class SelectionSort<X extends Comparable<X>> extends SortWithHelper<X> {
      * @param <Y> the underlying element type.
      */
     public static <Y extends Comparable<Y>> void mutatingSelectionSort(Y[] ys) throws IOException {
-        new SelectionSort<Y>(Config.load(SelectionSort.class)).mutatingSort(ys);
+        try (SelectionSort<Y> sort = new SelectionSort<>(Config.load(SelectionSort.class))) {
+            sort.mutatingSort(ys);
+        }
     }
 
     public static final String DESCRIPTION = "Selection sort";

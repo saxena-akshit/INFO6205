@@ -20,17 +20,14 @@ public class PrimTest {
 
     static class Route implements Comparable<Route>, Sequenced {
 
-        @Override
         public int getSequence() {
             return sequence;
         }
 
-        @Override
         public void setSequence(int sequence) {
 
         }
 
-        @Override
         public int compareTo(Route o) {
             return Double.compare(cost, o.cost);
         }

@@ -1,6 +1,6 @@
 package edu.neu.coe.info6205.sort.classic;
 
-import edu.neu.coe.info6205.sort.GenericHelper;
+import edu.neu.coe.info6205.sort.Helper;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class ClassicSortTest {
     @Test
     public void mutatingSort() throws IOException {
         ClassicSort<MyClass> sorter = new ClassicSort<>();
-        GenericHelper<MyClass> helper = sorter.getHelper();
+        Helper<MyClass> helper = sorter.getHelper();
         int n = 100;
         helper.init(n);
         MyClass[] xs = helper.random(MyClass.class, (random -> new MyClass(random.nextInt(100000))));

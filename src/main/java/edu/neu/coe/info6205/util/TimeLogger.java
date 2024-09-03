@@ -3,20 +3,34 @@ package edu.neu.coe.info6205.util;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
+/**
+ * Class to handle logging of times, both raw and normalized.
+ */
 public class TimeLogger {
-    private final String prefix;
-    private final BiFunction<Double, Integer, Double> normalizer;
 
-    public TimeLogger(String prefix, BiFunction<Double, Integer, Double> normalizer) {
+    /**
+     * Method to log the time (in mSecs).
+     * If minimumComparisons is null, we just log the raw time.
+     * Otherwise, we log the normalized time based on minimumComparisons.
+     *
+     * @param description the description of the task being timed.
+     * @param time        the raw time.
+     * @param N           the size of the problem.
+     */
+    public void log(String description, double time, int N) {
+        double t = minimumComparisons == null ? time : time / minimumComparisons.apply(N) * 1e6;
+        logger.info(description + ": " + prefix + " " + formatTime(t));
+    }
+
+    public TimeLogger(String prefix, Function<Integer, Double> minimumComparisons) {
         this.prefix = prefix;
-        this.normalizer = normalizer;
+        this.minimumComparisons = minimumComparisons;
     }
 
-    public void log(Double time, Integer N) {
-        logger.info(prefix + " " + formatTime(normalizer.apply(time, N)));
-    }
+    private final String prefix;
+    private final Function<Integer, Double> minimumComparisons;
 
     private static String formatTime(double time) {
         decimalFormat.applyPattern(timePattern);
@@ -26,7 +40,7 @@ public class TimeLogger {
     final static LazyLogger logger = new LazyLogger(TimeLogger.class);
 
     private static final Locale locale = new Locale("en", "US");
-    private static final String timePattern = "######.00";
+    private static final String timePattern = "######.0000";
     private static final DecimalFormat decimalFormat = (DecimalFormat)
             NumberFormat.getNumberInstance(locale);
 

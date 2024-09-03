@@ -2,7 +2,7 @@ package edu.neu.coe.info6205.dynamicProgramming.lucas;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class FibonacciTest {
 

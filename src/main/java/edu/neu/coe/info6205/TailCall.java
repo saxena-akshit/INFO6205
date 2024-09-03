@@ -70,7 +70,7 @@ class TailCalls {
      * @return value.
      */
     static <T> TailCall<T> done(final T value) {
-        return new TailCall<T>() {
+        return new TailCall<>() {
             public boolean isComplete() {
                 return true;
             }

@@ -150,7 +150,7 @@ public class OrderedArray<K extends Comparable<K>> implements Iterable<K> {
      * @return the array as a K[].
      */
     K[] getArray() {
-        @SuppressWarnings({"unchecked", "ConstantConditions"}) K[] result = (K[]) new Object[size];
+        @SuppressWarnings({"unchecked"}) K[] result = (K[]) new Object[size];
         //noinspection SuspiciousSystemArraycopy
         System.arraycopy(this.array, 0, result, 0, size);
         return result;

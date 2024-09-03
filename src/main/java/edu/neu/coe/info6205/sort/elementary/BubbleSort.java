@@ -3,10 +3,7 @@
  */
 package edu.neu.coe.info6205.sort.elementary;
 
-import edu.neu.coe.info6205.sort.BaseHelper;
-import edu.neu.coe.info6205.sort.Helper;
-import edu.neu.coe.info6205.sort.HelperFactory;
-import edu.neu.coe.info6205.sort.SortWithHelper;
+import edu.neu.coe.info6205.sort.*;
 import edu.neu.coe.info6205.util.Config;
 import edu.neu.coe.info6205.util.LazyLogger;
 import edu.neu.coe.info6205.util.Stopwatch;
@@ -15,11 +12,22 @@ import java.io.IOException;
 import java.util.Random;
 
 /**
- * Class to sort arrays of (comparable) Xs which extends SortWithHelper and Sort.
+ * Class to sort arrays of (comparable) Xs which extends SortWithComparableHelper and Sort.
  *
  * @param <X> the underlying type of elements to be sorted (must support Comparable).
  */
-public class BubbleSort<X extends Comparable<X>> extends SortWithHelper<X> {
+public class BubbleSort<X extends Comparable<X>> extends SortWithComparableHelper<X> {
+
+    /**
+     * Constructor for any subclasses to use.
+     *
+     * @param N      the number of elements expected.
+     * @param nRuns  the expected number of runs.
+     * @param config the configuration.
+     */
+    public BubbleSort(int N, int nRuns, Config config) {
+        super(DESCRIPTION, N, nRuns, config);
+    }
 
     /**
      * Constructor for BubbleSort
@@ -28,11 +36,11 @@ public class BubbleSort<X extends Comparable<X>> extends SortWithHelper<X> {
      * @param config the configuration.
      */
     public BubbleSort(int N, Config config) {
-        super(DESCRIPTION, N, config);
+        super(DESCRIPTION, N, 1, config);
     }
 
     public BubbleSort(Config config) {
-        this(new BaseHelper<>(DESCRIPTION, config));
+        this(new NonInstrumentingComparableHelper<>(DESCRIPTION, config));
     }
 
     /**
@@ -45,7 +53,7 @@ public class BubbleSort<X extends Comparable<X>> extends SortWithHelper<X> {
     }
 
     /**
-     * Sort the sub-array xs:from:to using bubble sort.
+     * Sort the subarray xs:from:to using bubble sort.
      *
      * @param xs   sort the array xs from "from" to "to".
      * @param from the index of the first element to sort.
@@ -70,8 +78,24 @@ public class BubbleSort<X extends Comparable<X>> extends SortWithHelper<X> {
      * @return true if we passed through the elements without swapping any.
      */
     private boolean optimizedInnerLoopSuccess(X[] xs, Helper<X> helper, int from, int j) {
+        if (from >= j - 1) return false;
         boolean swapped = false;
-        for (int i = from + 1; i < j; i++) swapped |= helper.swapStableConditional(xs, i);
+        // NOTE this first line is the clearest way to show the logic.
+//        for (int i = from + 1; i < j; i++) swapped |= helper.swapStableConditional(xs, i);
+        // NOTE the following lines correctly track hits.
+        int i = from;
+        X v = helper.get(xs, i);
+        X w = helper.get(xs, i + 1);
+        while (true) {
+            boolean b = helper.swapConditional(xs, v, i, i + 1, w);
+            swapped |= b;
+            i++;
+            if (i == j - 1) break;
+            if (!b) v = w;
+            w = helper.get(xs, i + 1);
+        }
+
+        // XXX return true if there were no swaps
         return !swapped;
     }
 
@@ -82,7 +106,9 @@ public class BubbleSort<X extends Comparable<X>> extends SortWithHelper<X> {
      * @param <Y> the underlying element type.
      */
     public static <Y extends Comparable<Y>> void mutatingBubbleSort(Y[] ys) throws IOException {
-        new BubbleSort<Y>(Config.load(BubbleSort.class)).mutatingSort(ys);
+        try (BubbleSort<Y> sort = new BubbleSort<>(Config.load(BubbleSort.class))) {
+            sort.mutatingSort(ys);
+        }
     }
 
     public static final String DESCRIPTION = "Bubble sort";
@@ -114,10 +140,10 @@ public class BubbleSort<X extends Comparable<X>> extends SortWithHelper<X> {
         logger.info("End InsertionSort");
     }
 
-    private static void doSort(SortWithHelper<Integer> sorter, Helper<Integer> helper, Stopwatch stopwatch) {
+    private static void doSort(Sort<Integer> sorter, Helper<Integer> helper, Stopwatch stopwatch) {
         Integer[] integers = helper.random(Integer.class, Random::nextInt);
         Integer[] sorted = sorter.sort(integers);
-        if (!helper.sorted(sorted)) System.err.println("Not sorted");
+        if (!helper.isSorted(sorted)) System.err.println("Not sorted");
         System.out.println(helper.getDescription() + " " + integers.length + " integers: " + stopwatch.lap());
     }
 

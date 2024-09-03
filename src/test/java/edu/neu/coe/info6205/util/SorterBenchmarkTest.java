@@ -12,7 +12,7 @@ public class SorterBenchmarkTest {
     @Before
     public void setUp() throws IOException {
         String[] strings = {"Hello", "Goodbye", "Ciao", "Willkommen"};
-        benchmark = new SorterBenchmark<>(String.class, new InsertionSort<>(Config.load(getClass())), strings, 100, new TimeLogger[]{new TimeLogger("test", (x, n) -> x / n)});
+        benchmark = new SorterBenchmark<>(String.class, new InsertionSort<>(Config.load(getClass())), strings, 100, new TimeLogger[]{new TimeLogger("test", n -> n * 1.0)});
     }
 
     @SuppressWarnings("EmptyMethod")
@@ -23,7 +23,7 @@ public class SorterBenchmarkTest {
 
     @Test
     public void run() {
-        benchmark.run(4);
+        benchmark.run("test", 4);
     }
 
     SorterBenchmark<String> benchmark = null;

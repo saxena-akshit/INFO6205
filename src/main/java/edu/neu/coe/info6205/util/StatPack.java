@@ -3,11 +3,24 @@ package edu.neu.coe.info6205.util;
 import java.util.HashMap;
 import java.util.function.Function;
 
+/**
+ * This class manages all of the "statistics" for an instrumented set of runs.
+ * <p>
+ * TODO add key "classification" and maybe also "heap access."
+ */
 public class StatPack {
 
-    public StatPack(Function<Double, Double> normalizer, int N, String... keys) {
+    /**
+     * Constructor of a StatPack.
+     *
+     * @param normalizer the normalizers.
+     * @param nRuns      the number of runs.
+     * @param keys       the set of keys for properties to be tracked.
+     */
+    public StatPack(Function<Double, Double> normalizer, int nRuns, int size, String... keys) {
+        n = nRuns;
         map = new HashMap<>();
-        for (String key : keys) map.put(key, new Statistics(key, normalizer, N));
+        for (String key : keys) map.put(key, new Statistics(key, normalizer, nRuns, size));
     }
 
     public void add(String key, double x) {
@@ -38,14 +51,20 @@ public class StatPack {
 
     @Override
     public String toString() {
-        final StringBuilder stringBuilder = new StringBuilder("StatPack {");
+        final StringBuilder stringBuilder = new StringBuilder("StatPack {runs: " + n + " ");
         if (map.isEmpty()) stringBuilder.append("<empty>}");
         for (String key : map.keySet()) {
             final Statistics statistics = map.get(key);
-            stringBuilder.append(statistics.toString()).append("; ");
+            String string = statistics.toString();
+            stringBuilder.append(string).append("; ");
         }
         return stringBuilder.toString().replaceAll("; $", "}");
     }
 
     private final HashMap<String, Statistics> map;
+    private final int n;
+
+    public boolean isInvalid() {
+        return n <= 0;
+    }
 }

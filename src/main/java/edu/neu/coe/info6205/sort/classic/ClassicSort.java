@@ -2,9 +2,9 @@ package edu.neu.coe.info6205.sort.classic;
 
 import edu.neu.coe.info6205.bqs.Bag;
 import edu.neu.coe.info6205.bqs.Bag_Array;
-import edu.neu.coe.info6205.sort.GenericHelper;
-import edu.neu.coe.info6205.sort.GenericSortWithGenericHelper;
-import edu.neu.coe.info6205.sort.Sort;
+import edu.neu.coe.info6205.sort.GenericSortWithHelper;
+import edu.neu.coe.info6205.sort.Helper;
+import edu.neu.coe.info6205.sort.ProcessingSort;
 import edu.neu.coe.info6205.sort.SortException;
 import edu.neu.coe.info6205.util.Config;
 
@@ -18,9 +18,14 @@ import java.util.Set;
  *
  * @param <X> the underlying type which must extend Classify.
  */
-public class ClassicSort<X extends Classify<X>> extends GenericSortWithGenericHelper<X> implements Sort<X> {
+public class ClassicSort<X extends Classify<X>> extends GenericSortWithHelper<X> implements ProcessingSort<X> {
 
     public static final String DESCRIPTION = "Classic sort";
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
+    }
 
     public void sort(X[] xs, int from, int to) {
         Map<Integer, Bag<X>> map = new HashMap<>();
@@ -74,13 +79,14 @@ public class ClassicSort<X extends Classify<X>> extends GenericSortWithGenericHe
         if (closeHelper) getHelper().close();
     }
 
-    ClassicSort(GenericHelper<X> helper) {
+    ClassicSort(Helper<X> helper) {
         super(helper);
         closeHelper = true;
     }
 
     ClassicSort() throws IOException {
-        super(DESCRIPTION, 0, Config.load(ClassicSort.class));
+        // NOTE: the comparator is null here.
+        super(DESCRIPTION, null, 0, 1, Config.load(ClassicSort.class));
         closeHelper = true;
     }
 

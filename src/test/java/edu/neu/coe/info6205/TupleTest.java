@@ -9,8 +9,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TupleTest {
 
@@ -28,7 +27,7 @@ public class TupleTest {
         assertTrue("tuple1.hashCode()!=tuple2.hashCode()", tuple1.hashCode() != tuple2.hashCode());
         assertEquals("tuple1.equals(tuple1)", tuple1, tuple1);
         assertEquals("tuple2.equals(tuple2)", tuple2, tuple2);
-        assertTrue("!tuple1.equals(tuple2)", !tuple1.equals(tuple2));
+        assertFalse("!tuple1.equals(tuple2)", tuple1.equals(tuple2));
         assertEquals("tuple1.toString()==\"Tuple(1, 3.141592653589793)\"", "Tuple(1, 3.141592653589793)", tuple1.toString());
     }
 
