@@ -463,9 +463,7 @@ public interface Helper<X> extends AutoCloseable, Comparator<X>, Instrument {
     void swapInto(X[] xs, int i, int j);
 
     /**
-     * Method to perform a stable swap using half-exchanges, and binary search.
-     * i.e. x[i] is moved leftwards to its proper place, and all elements from
-     * the destination of x[i] through x[i-1] are moved up one place.
+     * Method to perform a stable swap using half-exchanges, and binary search, i.e., x[i] is moved leftwards to its proper place, and all elements from the destination of x[i] through x[i-1] are moved up one place.
      * This type of swap is used by insertion sort.
      *
      * @param xs the array of X elements, whose elements 0 through i-1 MUST be sorted.
@@ -610,7 +608,7 @@ public interface Helper<X> extends AutoCloseable, Comparator<X>, Instrument {
 
     /**
      * @param n the size to be managed.
-     * @throws BaseComparableHelper.HelperException if n is inconsistent.
+     * @throws HelperException if n is inconsistent.
      */
     void init(int n);
 

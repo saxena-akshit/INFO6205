@@ -452,7 +452,7 @@ public class Group implements Generational<Group, Void>, Renderable, Countable {
     private Collection<Point> getPoints() {
         return points;
     }
-    // which is furthest from the origin of the coordinate system.
+    // Which is furthest from the origin of the coordinate system.
     // All cells have negative coordinates compared to extent2.
 
     private void applyLifeRules() {

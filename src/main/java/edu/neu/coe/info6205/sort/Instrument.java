@@ -41,7 +41,7 @@ public interface Instrument {
     /**
      * A hit is the approximation of an (amortized) cache page fault when accessing an array element.
      * The larger the array and the smaller the cache, the more likely a random array access will cause a page fault.
-     * But, we can't really take account of all that in this program so we just keep track of every time an array element is accessed.
+     * But we can't really take account of all that in this program, so we just keep track of every time an array element is accessed.
      */
     String HITS = "hits";
 

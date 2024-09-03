@@ -118,7 +118,7 @@ public class OrderedArray<K extends Comparable<K>> implements Iterable<K> {
 
     /**
      * Secondary constructor where only parameter array and makeCopy are explicit.
-     * comparator is set to OrderedArray.getComparator().
+     * Comparator is set to OrderedArray.getComparator().
      *
      * @param makeCopy true if the constructor should make a copy of the input array rather than simply referencing the input array.
      * @param array    the original array, which will NOT be affected by the sort.
@@ -129,7 +129,7 @@ public class OrderedArray<K extends Comparable<K>> implements Iterable<K> {
 
     /**
      * Secondary constructor where only parameter input is explicit.
-     * comparator is set to OrderedArray.getComparator() for the generic type K.
+     * Comparator is set to OrderedArray.getComparator() for the generic type K.
      * The input collection will never be affected by the ordering.
      *
      * @param input a Collection of K elements.

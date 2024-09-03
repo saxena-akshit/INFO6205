@@ -34,7 +34,7 @@ public class TimSort<X extends Comparable<X>> extends SortWithComparableHelper<X
      * Constructor for TimSort
      *
      * @param N      the number elements we expect to sort.
-     * @param nRuns
+     * @param nRuns  the number of runs to be expected (this is only significant when instrumenting).
      * @param config the configuration.
      */
     public TimSort(int N, int nRuns, Config config) {

@@ -9,7 +9,7 @@ import java.util.Stack;
  * graph of vertices named 0 through <em>V</em> – 1, where each
  * undirected edge is of type {@link Edge} and has a real-valued weight.
  * It supports the following two primary operations: add an edge to the graph,
- * iterate over all of the edges incident to a vertex. It also provides
+ * iterate over all the edges incident to a vertex. It also provides
  * methods for returning the degree of a vertex, the number of vertices
  * <em>V</em> in the graph, and the number of edges <em>E</em> in the graph.
  * Parallel edges and self-loops are permitted.
@@ -44,7 +44,7 @@ public class EdgeWeightedGraph {
     private final edu.neu.coe.info6205.graphs.BFS_and_prims.Bag<Edge>[] adj;
 
     /**
-     * Initializes an empty edge-weighted graph with {@code V} vertices and 0 edges.
+     * Initializes an empty edge-weighted graph with {@code V} vertices and zero edges.
      *
      * @param V the number of vertices
      * @throws IllegalArgumentException if {@code V < 0}

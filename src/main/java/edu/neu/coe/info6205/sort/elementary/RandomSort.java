@@ -95,7 +95,7 @@ public class RandomSort<X extends Comparable<X>> extends SortWithComparableHelpe
     /**
      * The number to be multiplied by N lg N in order to get the best efficiency from the pre-process.
      * Given that the probability of an inversion is 50%, we usually choose 2.0 here.
-     * But, slightly higher values may work better.
+     * But slightly higher values may work better.
      */
     public static final double FACTOR = 2.5;
 

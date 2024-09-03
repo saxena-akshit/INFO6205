@@ -9,6 +9,8 @@ public class BellmanFord {
     /**
      * Method to return the Maximum profit after selecting particular items using Bellman Ford Algorithm.
      *
+     * TODO fix generic type issues
+     *
      * @param graph the weights for each item.
      * @param source soruce Vertex.
      * @param target target Vertex.

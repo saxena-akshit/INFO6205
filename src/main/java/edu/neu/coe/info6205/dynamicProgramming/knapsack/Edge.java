@@ -3,9 +3,6 @@ package edu.neu.coe.info6205.dynamicProgramming.knapsack;
  * The {@code Edge} class represents the Weighted Edge with two Vertices.
  */
 public class Edge {
-    private Vertex U;
-    private Vertex V;
-    private double edgeWeight;
     /**
      * Initializes an edge between vertices {@code U} and {@code V} of
      * the given {@code edgeWeight}.
@@ -41,5 +38,9 @@ public class Edge {
     public Vertex destination(){
         return this.V;
     }
+
+    private final Vertex U;
+    private final Vertex V;
+    private final double edgeWeight;
 
 }

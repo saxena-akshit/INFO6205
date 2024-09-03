@@ -37,7 +37,7 @@ public class Position {
      * Method to parse a single cell.
      *
      * @param cell the String for the cell.
-     * @return a number between -1 and 1 inclusive.
+     * @return a number between -1 and one inclusive.
      */
     static int parseCell(String cell) {
         return switch (cell.toUpperCase()) {

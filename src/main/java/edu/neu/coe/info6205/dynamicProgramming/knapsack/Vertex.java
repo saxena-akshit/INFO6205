@@ -3,8 +3,6 @@ package edu.neu.coe.info6205.dynamicProgramming.knapsack;
  * The {@code Vertex} class represents the Vertex with an id and the bagCapacity.
  */
 public class Vertex {
-    private String id;
-    private double currentBagWeight;
     /**
      * Initializes a vertices with id and bagCapacity
      *
@@ -41,4 +39,6 @@ public class Vertex {
         return this.currentBagWeight;
     }
 
+    private String id;
+    private final double currentBagWeight;
 }

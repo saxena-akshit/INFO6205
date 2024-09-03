@@ -43,7 +43,7 @@ public class EdgeWeightedDigraph {
     private final int[] indegree;             // indegree[v] = indegree of vertex v
 
     /**
-     * Initializes an empty edge-weighted digraph with {@code V} vertices and 0 edges.
+     * Initializes an empty edge-weighted digraph with {@code V} vertices and zero edges.
      *
      * @param V the number of vertices
      * @throws IllegalArgumentException if {@code V < 0}

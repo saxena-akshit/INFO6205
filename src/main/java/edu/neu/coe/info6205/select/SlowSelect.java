@@ -51,7 +51,7 @@ public class SlowSelect<X extends Comparable<X>> implements Select<X> {
 
     /***
      * Knuth shuffle
-     * In iteration i, pick integer r between 0 and i uniformly at random
+     * In iteration i, pick integer r between zero and i uniformly at random
      * Swap a[i] and a[r].
      *
      * @param a the array

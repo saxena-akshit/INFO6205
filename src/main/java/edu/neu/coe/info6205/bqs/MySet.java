@@ -67,8 +67,7 @@ public class MySet<T> implements Set<T> {
      * are returned by its iterator, this method must return the
      * elements in the same order.
      *
-     * <p>The returned array will be "safe" in that no references to it
-     * are maintained by this set.  (In other words, this method must
+     * <p>The returned array will be "safe" in that no references to it are maintained by this set.  (In other words, this method must
      * allocate a new array even if this set is backed by an array).
      * The caller is thus free to modify the returned array.
      *

@@ -7,7 +7,7 @@ import java.util.Random;
  * Wheel of Fortune class which will yield a value of T according to a probability distribution
  * given by the set of events.
  * <p>
- * In order to pass all of the unit tests, you will also have to implement code in FrequencyCounter.
+ * In order to pass all the unit tests, you will also have to implement code in FrequencyCounter.
  * That bit of code is very simple.
  *
  * @param <T> the type yielded by get().

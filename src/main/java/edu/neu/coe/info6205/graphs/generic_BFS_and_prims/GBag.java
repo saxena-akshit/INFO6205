@@ -5,11 +5,11 @@ import java.util.NoSuchElementException;
 
 /**
  * The {@code Bag} class represents a bag (or multiset) of
- * generic items. It supports insertion and iterating over the
- * items in arbitrary order.
+ * generic items.
+ * It supports insertion and iterating over the items in arbitrary order.
  * <p>
  * This implementation uses a singly linked list with a static nested class Node.
- * textbook that uses a non-static nested class.
+ * Whereas the textbook uses a non-static nested class.
  * The <em>add</em>, <em>isEmpty</em>, and <em>size</em> operations
  * take constant time. Iteration takes time proportional to the number of items.
  * <p>

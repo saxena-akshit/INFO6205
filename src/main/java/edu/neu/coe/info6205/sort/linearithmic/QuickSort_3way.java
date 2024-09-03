@@ -23,7 +23,7 @@ public class QuickSort_3way<X extends Comparable<X>> extends QuickSort<X> {
     }
 
     public QuickSort_3way(Config config) {
-        this(new NonInstrumentingComparableHelper<X>(DESCRIPTION, config));
+        this(new NonInstrumentingComparableHelper<>(DESCRIPTION, config));
     }
 
     /**

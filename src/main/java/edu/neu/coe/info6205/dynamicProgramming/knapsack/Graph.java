@@ -8,9 +8,6 @@ import java.util.LinkedList;
  */
 public class Graph<T> {
 
-    private HashMap<T, LinkedList<Edge>> adjacent;
-    private Vertex root;
-
     public Vertex getVertex() {
         return root;
     }
@@ -20,19 +17,19 @@ public class Graph<T> {
      */
     public Graph(Vertex root){
         this.root=root;
-        adjacent =new HashMap<T,LinkedList<Edge>>();
+        adjacent = new HashMap<>();
     }
     /**
      * Adds a new Vertex into the adjacency list of vertices.
      */
     public void addVertex(T v){
-        adjacent.put(v,new LinkedList<Edge>());
+        adjacent.put(v, new LinkedList<>());
     }
     /**
      * Adds entry to the given Vertex as a adjacent vertex.
      */
     public void addEdge(Vertex U, Vertex V, double edgeWeight){
-        adjacent.getOrDefault(U,new LinkedList<Edge>()).add(new Edge(U,V,edgeWeight));
+        adjacent.getOrDefault(U, new LinkedList<>()).add(new Edge(U,V,edgeWeight));
     }
     /**
      * Returns the directed edges incident from vertex {@code v}.
@@ -46,4 +43,7 @@ public class Graph<T> {
         else
             return null;
     }
+
+    private final HashMap<T, LinkedList<Edge>> adjacent;
+    private final Vertex root;
 }

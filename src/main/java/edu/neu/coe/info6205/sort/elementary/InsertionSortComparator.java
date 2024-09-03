@@ -26,7 +26,7 @@ public class InsertionSortComparator<X> extends SortWithHelper<X> {
      * @param description the description.
      * @param comparator  the comparator to use.
      * @param N           the number of elements expected.
-     * @param nRuns
+     * @param nRuns  the number of runs to be expected (this is only significant when instrumenting).
      * @param config      the configuration.
      */
     protected InsertionSortComparator(String description, Comparator<X> comparator, int N, int nRuns, Config config) {
@@ -37,7 +37,7 @@ public class InsertionSortComparator<X> extends SortWithHelper<X> {
      * Constructor for InsertionSort
      *
      * @param N      the number elements we expect to sort.
-     * @param nRuns
+     * @param nRuns  the number of runs to be expected (this is only significant when instrumenting).
      * @param config the configuration.
      */
     public InsertionSortComparator(Comparator<X> comparator, int N, int nRuns, Config config) {

@@ -7,8 +7,8 @@ import java.util.NoSuchElementException;
 /**
  * The {@code IndexMinPQ} class represents an indexed priority queue of generic keys.
  * It supports the usual <em>insert</em> and <em>delete-the-minimum</em>
- * operations, along with <em>delete</em> and <em>change-the-key</em>
- * methods. In order to let the client refer to keys on the priority queue,
+ * operations, along with <em>delete</em> and <em>change-the-key</em> methods.
+ * In order to let the client refer to keys on the priority queue,
  * an integer between {@code 0} and {@code maxN - 1}
  * is associated with each key—the client uses this integer to specify
  * which key to delete or change.
