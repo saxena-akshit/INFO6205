@@ -11,15 +11,15 @@ import java.util.function.UnaryOperator;
 public class Timer {
 
     /**
-     * Run the given function n times, once per "lap" and then return the result of
-     * calling meanLapTime().
-     * The clock will be running when the method is invoked and when it is quit.
+     * Run the given function n times, once per "lap" and then return the result
+     * of calling meanLapTime(). The clock will be running when the method is
+     * invoked and when it is quit.
      * <p>
      * This is the simplest form of repeat.
      *
-     * @param n        the number of repetitions.
+     * @param n the number of repetitions.
      * @param function a function which yields a T.
-     * @param <T>      the type supplied by function (amy be Void).
+     * @param <T> the type supplied by function (amy be Void).
      * @return the average milliseconds per repetition.
      */
     public <T> double repeat(int n, Supplier<T> function) {
@@ -34,17 +34,17 @@ public class Timer {
     }
 
     /**
-     * Run the given functions n times, once per "lap" and then return the mean lap
-     * time.
+     * Run the given functions n times, once per "lap" and then return the mean
+     * lap time.
      *
-     * @param n        the number of repetitions.
+     * @param n the number of repetitions.
      * @param supplier a function which supplies a different T value for each
-     *                 repetition.
+     * repetition.
      * @param function a function T=>U and which is to be timed.
-     * @param <T>      the type which is supplied by supplier and passed in to
-     *                 function.
-     * @param <U>      the type which is the result of <code>function</code> (may be
-     *                 Void).
+     * @param <T> the type which is supplied by supplier and passed in to
+     * function.
+     * @param <U> the type which is the result of <code>function</code> (may be
+     * Void).
      * @return the average milliseconds per repetition.
      */
     public <T, U> double repeat(int n, Supplier<T> supplier, Function<T, U> function) {
@@ -52,53 +52,49 @@ public class Timer {
     }
 
     /**
-     * Pause (without counting a lap); run the given functions n times while being
-     * timed, i.e., once per "lap", and finally return the result of calling
-     * meanLapTime().
+     * Pause (without counting a lap); run the given functions n times while
+     * being timed, i.e., once per "lap", and finally return the result of
+     * calling meanLapTime().
      *
-     * @param n            the number of repetitions.
-     * @param warmup       true if this is in the warmup phase.
-     * @param supplier     a function which supplies a T value.
-     * @param function     a function T=>U and which is to be timed.
-     * @param preFunction  a function which pre-processes a T value and which
-     *                     precedes the call of function, but which is not timed
-     *                     (may be null). The result of the preFunction, if any, is
-     *                     also a T.
-     * @param postFunction a function which consumes a U and which succeeds the call
-     *                     of function, but which is not timed (may be null).
-     * @param <T>          the type which is supplied by supplier, processed by
-     *                     prefunction (if any), and passed in to function.
-     * @param <U>          the type which is the result of function and the input to
-     *                     postFunction (if any).
+     * @param n the number of repetitions.
+     * @param warmup true if this is in the warmup phase.
+     * @param supplier a function which supplies a T value.
+     * @param function a function T=>U and which is to be timed.
+     * @param preFunction a function which pre-processes a T value and which
+     * precedes the call of function, but which is not timed (may be null). The
+     * result of the preFunction, if any, is also a T.
+     * @param postFunction a function which consumes a U and which succeeds the
+     * call of function, but which is not timed (may be null).
+     * @param <T> the type which is supplied by supplier, processed by
+     * prefunction (if any), and passed in to function.
+     * @param <U> the type which is the result of function and the input to
+     * postFunction (if any).
      * @return the average milliseconds per repetition.
      */
-    public <T, U> double repeat(int n, boolean warmup, Supplier<T> supplier, Function<T, U> function,
-            UnaryOperator<T> preFunction, Consumer<U> postFunction) {
-        double totalTime = 0.0; // To accumulate total time taken
-        for (int i = 0; i < n; i++) {
-            T input = supplier.get(); // Get the input from the supplier
+    public <T, U> double repeat(int n, boolean warmup, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction, Consumer<U> postFunction) {
 
-            // Apply the pre-function if it exists
+        pause();
+
+        for (int i = 0; i < n; i++) {
+            T input = supplier.get();
+
+            // apply prefunction if non null
             if (preFunction != null) {
                 input = preFunction.apply(input);
             }
 
-            long startTime = System.nanoTime(); // Start timing
-            U result = function.apply(input); // Execute the main function
-            long endTime = System.nanoTime(); // End timing
+            resume();
 
-            // Calculate elapsed time in milliseconds
-            double elapsedTime = (endTime - startTime) / 1_000_000.0;
-            totalTime += elapsedTime; // Accumulate total time
+            U result = function.apply(input);
+            pauseAndLap();
 
-            // Call the post-function if it exists
             if (postFunction != null) {
                 postFunction.accept(result);
             }
-        }
 
-        // Calculate and return the average time
-        return totalTime / n;
+        }
+        double meanTime = meanLapTime();
+        return meanTime;
     }
 
     /**
@@ -119,14 +115,15 @@ public class Timer {
      * @throws TimerException if this Timer is running.
      */
     public double meanLapTime() {
-        if (running)
+        if (running) {
             throw new TimerException();
+        }
         return toMillisecs(ticks) / laps;
     }
 
     /**
-     * Pause this timer at the end of a "lap" (repetition).
-     * The lap counter will be incremented by one.
+     * Pause this timer at the end of a "lap" (repetition). The lap counter will
+     * be incremented by one.
      *
      * @throws TimerException if this Timer is not running.
      */
@@ -142,27 +139,29 @@ public class Timer {
      * @throws TimerException if this Timer is already running.
      */
     public void resume() {
-        if (running)
+        if (running) {
             throw new TimerException();
+        }
         ticks -= getClock();
         running = true;
     }
 
     /**
-     * Increment the lap counter without pausing.
-     * This is the equivalent of calling pause and resume.
+     * Increment the lap counter without pausing. This is the equivalent of
+     * calling pause and resume.
      *
      * @throws TimerException if this Timer is not running.
      */
     public void lap() {
-        if (!running)
+        if (!running) {
             throw new TimerException();
+        }
         laps++;
     }
 
     /**
-     * Pause this timer during a "lap" (repetition).
-     * The lap counter will remain the same.
+     * Pause this timer during a "lap" (repetition). The lap counter will remain
+     * the same.
      *
      * @throws TimerException if this Timer is not running.
      */
@@ -172,25 +171,25 @@ public class Timer {
     }
 
     /**
-     * Method to yield the total number of milliseconds elapsed.
-     * NOTE: an exception will be thrown if this is called while the timer is
-     * running.
+     * Method to yield the total number of milliseconds elapsed. NOTE: an
+     * exception will be thrown if this is called while the timer is running.
      *
      * @return the total number of milliseconds elapsed for this timer.
      */
     public double millisecs() {
-        if (running)
+        if (running) {
             throw new TimerException();
+        }
         return toMillisecs(ticks);
     }
 
     @Override
     public String toString() {
-        return "Timer{" +
-                "ticks=" + ticks +
-                ", laps=" + laps +
-                ", running=" + running +
-                '}';
+        return "Timer{"
+                + "ticks=" + ticks
+                + ", laps=" + laps
+                + ", running=" + running
+                + '}';
     }
 
     /**
@@ -223,35 +222,30 @@ public class Timer {
      * Get the number of ticks from the system clock.
      * <p>
      * NOTE: (Maintain consistency) There are two system methods for getting the
-     * clock time.
-     * Ensure that this method is consistent with toMillisecs.
+     * clock time. Ensure that this method is consistent with toMillisecs.
      *
-     * @return the number of ticks for the system clock. Currently defined as nano
-     *         time.
+     * @return the number of ticks for the system clock. Currently defined as
+     * nano time.
      */
     private static long getClock() {
-        // TO BE IMPLEMENTED
-        return 0;
-        // END SOLUTION
+        return System.nanoTime();
     }
 
     /**
      * NOTE: (Maintain consistency) There are two system methods for getting the
-     * clock time.
-     * Ensure that this method is consistent with getTicks.
+     * clock time. Ensure that this method is consistent with getTicks.
      *
      * @param ticks the number of clock ticks -- currently in nanoseconds.
      * @return the corresponding number of milliseconds.
      */
     private static double toMillisecs(long ticks) {
-        // TO BE IMPLEMENTED
-        return 0;
-        // END SOLUTION
+        return ticks / 1000000;
     }
 
     final static LazyLogger logger = new LazyLogger(Timer.class);
 
     static class TimerException extends RuntimeException {
+
         public TimerException() {
         }
 

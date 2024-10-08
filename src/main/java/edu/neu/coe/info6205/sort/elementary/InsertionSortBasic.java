@@ -8,9 +8,8 @@ import java.util.Comparator;
  */
 public class InsertionSortBasic<S> {
 
-    public static <X> InsertionSortBasic<X> create() {
-        //noinspection unchecked
-        return new InsertionSortBasic<>((o1, o2) ->  ((Comparable<X>) o1).compareTo(o2));
+    public static <X extends Comparable<X>> InsertionSortBasic<X> create() {
+        return new InsertionSortBasic<>(Comparable::compareTo);
     }
 
     public void sort(S[] a) {
@@ -41,14 +40,14 @@ public class InsertionSortBasic<S> {
      * @param a    the (sorted) array into which the transitional element should be moved.
      */
     private void insert(int from, int i, S[] a) {
-        // TO BE IMPLEMENTED  : implement inner loop of insertion sort using comparator
-        // END SOLUTION
-    }
+        S key = a[i];
+        int j = i - 1;
 
-    private void swap(Object[] a, int j, int i) {
-        Object temp = a[j];
-        a[j] = a[i];
-        a[i] = temp;
+        while (j >= from && comparator.compare(a[j], key) > 0) {
+            a[j + 1] = a[j];
+            j--;
+        }
+        a[j + 1] = key;
     }
 
     private final Comparator<S> comparator;
