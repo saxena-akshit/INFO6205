@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 /**
@@ -43,7 +42,7 @@ public class PriorityQueue<K> implements Iterable<K> {
      * @param comparator a comparator for the type K
      * @param floyd true if we use Floyd's trick
      */
-    public PriorityQueue(boolean max, Object[] binHeap, int first, int last, Comparator<K> comparator, boolean floyd) {
+    public PriorityQueue(boolean max, Object[] binHeap, int first, int last, Comparator<K> comparator, boolean floyd, int arity) {
         this.max = max;
         this.first = first;
         this.comparator = comparator;
@@ -51,6 +50,7 @@ public class PriorityQueue<K> implements Iterable<K> {
         //noinspection unchecked
         this.binHeap = (K[]) binHeap;
         this.floyd = floyd;
+        this.arity = arity;
     }
 
     /**
@@ -63,10 +63,10 @@ public class PriorityQueue<K> implements Iterable<K> {
      * a Minimum PQ.
      * @param comparator a comparator for the type K
      */
-    public PriorityQueue(int n, int first, boolean max, Comparator<K> comparator, boolean floyd) {
+    public PriorityQueue(int n, int first, boolean max, Comparator<K> comparator, boolean floyd, int arity) {
 
         // NOTE that we reserve the first element of the binary heap, so the length must be n+1, not n
-        this(max, new Object[n + first], first, 0, comparator, floyd);
+        this(max, new Object[n + first], first, 0, comparator, floyd, arity);
     }
 
     /**
@@ -78,10 +78,10 @@ public class PriorityQueue<K> implements Iterable<K> {
      * a Minimum PQ.
      * @param comparator a comparator for the type K
      */
-    public PriorityQueue(int n, boolean max, Comparator<K> comparator, boolean floyd) {
+    public PriorityQueue(int n, boolean max, Comparator<K> comparator, boolean floyd, int arity) {
 
         // NOTE that we reserve the first element of the binary heap, so the length must be n+1, not n
-        this(n, 1, max, comparator, floyd);
+        this(n, 1, max, comparator, floyd, arity);
     }
 
     /**
@@ -96,7 +96,7 @@ public class PriorityQueue<K> implements Iterable<K> {
     public PriorityQueue(int n, boolean max, Comparator<K> comparator) {
 
         // NOTE that we reserve the first element of the binary heap, so the length must be n+1, not n
-        this(n, 1, max, comparator, false);
+        this(n, 1, max, comparator, false, 2);
     }
 
     /**
@@ -107,7 +107,7 @@ public class PriorityQueue<K> implements Iterable<K> {
      * @param comparator a comparator for the type K
      */
     public PriorityQueue(int n, Comparator<K> comparator) {
-        this(n, 1, true, comparator, true);
+        this(n, 1, true, comparator, true, 2);
     }
 
     /**
@@ -152,8 +152,8 @@ public class PriorityQueue<K> implements Iterable<K> {
             throw new PQException("Priority queue is empty");
         }
         if (floyd) {
-            return doTake(this::snake); 
-        }else {
+            return doTake(this::snake);
+        } else {
             return doTake(this::sink);
         }
     }
@@ -166,32 +166,26 @@ public class PriorityQueue<K> implements Iterable<K> {
         return result;
     }
 
-    /**
-     * Sink the element at index k down
-     */
-    void sink(@SuppressWarnings("SameParameterValue") int k) {
-        doHeapify(k, (a, b) -> !unordered(a, b));
-    }
-
-    private int doHeapify(int k, BiPredicate<Integer, Integer> p) {
-        int i = k;
-        while (firstChild(i) <= last + first - 1) {
-            int j = firstChild(i);
-            if (j < last + first - 1 && unordered(j, j + 1)) {
-                j++;
+    int sink(int k) {
+        while (firstChild(k) <= last) {
+            int j = firstChild(k);
+            for (int i = 1; i < arity && j + i <= last; i++) {
+                if (unordered(j + i, j)) {
+                    j = j + i;
+                }
             }
-            if (p.test(i, j)) {
+            if (!unordered(k, j)) {
                 break;
             }
-            swap(i, j);
-            i = j;
+            swap(k, j);
+            k = j;
         }
-        return i;
+        return k;
     }
 
-    //Special sink method that sink the element and then swim the element back
-    void snake(@SuppressWarnings("SameParameterValue") int k) {
-        swimUp(doHeapify(k, (a, b) -> !unordered(a, b)));
+    void snake(int k) {
+        k = sink(k);
+        swimUp(k);
     }
 
     /**
@@ -231,7 +225,7 @@ public class PriorityQueue<K> implements Iterable<K> {
      * Get the index of the parent of the element at index k
      */
     private int parent(int k) {
-        return (k + 1 - first) / 2 + first - 1;
+        return (k - first) / arity + first;
     }
 
     /**
@@ -239,7 +233,7 @@ public class PriorityQueue<K> implements Iterable<K> {
      * the second child will be one greater than the result.
      */
     private int firstChild(int k) {
-        return (k + 1 - first) * 2 + first - 1;
+        return (k - first) * arity + first + 1;
     }
 
     /**
@@ -261,6 +255,7 @@ public class PriorityQueue<K> implements Iterable<K> {
     private final K[] binHeap; // binHeap[i] is ith element of binary heap (first element is reserved)
     private int last; // number of elements in the binary heap
     private final boolean floyd; //Determine whether floyd's snake method is on or off inside the take method
+    private final int arity;
 
     /**
      * Non-mutating iterator over all values of this PriorityQueue. NOTE: after
@@ -275,7 +270,8 @@ public class PriorityQueue<K> implements Iterable<K> {
         if (first > 0) {
             result.next(); // strip off the leading null value.
 
-                }return result;
+        }
+        return result;
     }
 
     public static void main(String[] args) {
@@ -294,13 +290,13 @@ public class PriorityQueue<K> implements Iterable<K> {
         s1[4] = "E";
         boolean max = true;
         boolean floyd = true;
-        PriorityQueue<String> PQ_string_floyd = new PriorityQueue<>(max, s1, 1, 5, Comparator.comparing(String::toString), floyd);
-        PriorityQueue<String> PQ_string_nofloyd = new PriorityQueue<>(max, s1, 1, 5, Comparator.comparing(String::toString), false);
+        PriorityQueue<String> PQ_string_floyd = new PriorityQueue<>(max, s1, 1, 5, Comparator.comparing(String::toString), floyd, 2);
+        PriorityQueue<String> PQ_string_nofloyd = new PriorityQueue<>(max, s1, 1, 5, Comparator.comparing(String::toString), false, 2);
         Integer[] s2 = new Integer[5]; //created an Integer type array with size 5
         for (int i = 0; i < 5; i++) {
             s2[i] = i;
         }
-        PriorityQueue<Integer> PQ_int_floyd = new PriorityQueue<>(max, s2, 1, 5, Comparator.comparing(Integer::intValue), floyd);
-        PriorityQueue<Integer> PQ_int_nofloyd = new PriorityQueue<>(max, s2, 1, 5, Comparator.comparing(Integer::intValue), false);
+        PriorityQueue<Integer> PQ_int_floyd = new PriorityQueue<>(max, s2, 1, 5, Comparator.comparing(Integer::intValue), floyd, 2);
+        PriorityQueue<Integer> PQ_int_nofloyd = new PriorityQueue<>(max, s2, 1, 5, Comparator.comparing(Integer::intValue), false, 2);
     }
 }
