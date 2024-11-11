@@ -1,89 +1,81 @@
 package edu.neu.coe.info6205.sort.par;
 
 import java.io.BufferedWriter;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
 
-/**
- * This code has been fleshed out by Ziyao Qiao. Thanks very much.
- * CONSIDER tidy it up a bit.
- */
 public class Main {
 
     public static void main(String[] args) {
-        processArgs(args);
-        System.out.println("Degree of parallelism: " + ForkJoinPool.getCommonPoolParallelism());
-        Random random = new Random();
-        int[] array = new int[2000000];
-        ArrayList<Long> timeList = new ArrayList<>();
-        for (int j = 50; j < 100; j++) {
-            ParSort.cutoff = 10000 * (j + 1);
-            // for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
-            long time;
-            long startTime = System.currentTimeMillis();
-            for (int t = 0; t < 10; t++) {
-                for (int i = 0; i < array.length; i++) array[i] = random.nextInt(10000000);
-                ParSort.sort(array, 0, array.length);
+        // Array sizes to test
+        int[] arraySizes = {1000000, 2000000, 4000000, 8000000};
+
+        // Cutoff values to test
+        int[] cutoffValues = {1000, 5000, 10000, 50000, 100000};
+
+        // Number of runs for each configuration
+        final int RUNS_PER_TEST = 5;
+
+        try (FileWriter fw = new FileWriter("sorting_results.csv"); BufferedWriter bw = new BufferedWriter(fw)) {
+
+            // Write CSV header
+            bw.write("ArraySize,Cutoff,ThreadCount,RunNumber,ExecutionTime(ms)\n");
+
+            // Test different array sizes
+            for (int arraySize : arraySizes) {
+                System.out.println("\nTesting array size: " + arraySize);
+
+                // Test different cutoff values
+                for (int cutoff : cutoffValues) {
+                    ParSort.cutoff = cutoff;
+                    System.out.println("\nCutoff value: " + cutoff);
+                    System.out.println("Thread count: " + ForkJoinPool.getCommonPoolParallelism());
+
+                    // Multiple runs for each configuration
+                    for (int run = 1; run <= RUNS_PER_TEST; run++) {
+                        // Generate random array
+                        int[] array = new int[arraySize];
+                        Random random = new Random();
+                        for (int i = 0; i < array.length; i++) {
+                            array[i] = random.nextInt(10000000);
+                        }
+
+                        // Time the sort
+                        long startTime = System.currentTimeMillis();
+                        ParSort.sort(array, 0, array.length);
+                        long endTime = System.currentTimeMillis();
+                        long duration = endTime - startTime;
+
+                        // Verify the sort worked correctly
+                        if (!isSorted(array)) {
+                            System.err.println("Array not sorted correctly!");
+                            continue;
+                        }
+
+                        // Write results to CSV
+                        String result = String.format("%d,%d,%d,%d,%d\n",
+                                arraySize, cutoff, ForkJoinPool.getCommonPoolParallelism(),
+                                run, duration);
+                        bw.write(result);
+                        bw.flush();
+
+                        System.out.printf("Run %d: %dms%n", run, duration);
+                    }
+                }
             }
-            long endTime = System.currentTimeMillis();
-            time = (endTime - startTime);
-            timeList.add(time);
-
-
-            System.out.println("cutoff：" + (ParSort.cutoff) + "\t\t10times Time:" + time + "ms");
-
-        }
-        try {
-            FileOutputStream fis = new FileOutputStream("./src/result.csv");
-            OutputStreamWriter isr = new OutputStreamWriter(fis);
-            BufferedWriter bw = new BufferedWriter(isr);
-            int j = 0;
-            for (long i : timeList) {
-                String content = (double) 10000 * (j + 1) / 2000000 + "," + (double) i / 10 + "\n";
-                j++;
-                bw.write(content);
-                bw.flush();
-            }
-            bw.close();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static void processArgs(String[] args) {
-        String[] xs = args;
-        while (xs.length > 0)
-            if (xs[0].startsWith("-")) xs = processArg(xs);
+    private static boolean isSorted(int[] array) {
+        for (int i = 1; i < array.length; i++) {
+            if (array[i - 1] > array[i]) {
+                return false;
+            }
+        }
+        return true;
     }
-
-    private static String[] processArg(String[] xs) {
-        String[] result = new String[0];
-        System.arraycopy(xs, 2, result, 0, xs.length - 2);
-        processCommand(xs[0], xs[1]);
-        return result;
-    }
-
-    private static void processCommand(String x, String y) {
-        if (x.equalsIgnoreCase("N")) setConfig(x, Integer.parseInt(y));
-        else
-            // TODO sort this out
-            if (x.equalsIgnoreCase("P")) //noinspection ResultOfMethodCallIgnored
-                ForkJoinPool.getCommonPoolParallelism();
-    }
-
-    private static void setConfig(String x, int i) {
-        configuration.put(x, i);
-    }
-
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private static final Map<String, Integer> configuration = new HashMap<>();
-
-
 }
